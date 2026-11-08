@@ -25,6 +25,19 @@ Node 20+. Environment variables, all optional:
 
 `render.yaml` deploys it to Render with a 1 GB disk so result links survive restarts. On a plan without a disk it still works, but shared links reset on each deploy.
 
+## Command line
+
+Scan before you install or run anything:
+
+```
+node cli.js ./some-folder
+node cli.js test.zip
+node cli.js github.com/owner/repo      # falls back to the live site if GitHub is blocked
+node cli.js npm:package@1.2.3          # downloads the package tarball into memory, never installs it
+```
+
+Add `--json` for machine-readable output and `--offline` to skip npm lookups. Exit codes: 0 no known red flags, 1 worth checking, 2 red flags, 3 could not scan.
+
 ## What it checks
 
 - npm install hooks (`preinstall`, `install`, `postinstall`, `prepare`), following `npm run x` chains, and linking each hook to the file it runs
