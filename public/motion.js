@@ -442,29 +442,50 @@ function drawJelly(j, t, dt) {
 
 // Shafts of sunlight coming down through the water from the surface, slanting slightly,
 // widening as they fall, and slowly swaying and breathing.
-const SUN = '255,214,110';
+// The light is the scanner: while a scan runs the shafts brighten and sweep through the water like
+// a searchlight; when the verdict lands they settle into its colour (rose for red flags, amber for
+// worth checking, calm gold for no known red flags). window.__sunMood(state) sets it.
+const MOODS = {
+  idle:  { c: [255, 214, 110], k: 1.0, sweep: 0 },
+  scan:  { c: [255, 226, 150], k: 1.9, sweep: 1 },
+  red:   { c: [255, 118, 132], k: 1.35, sweep: 0 },
+  amber: { c: [255, 160, 78],  k: 1.2, sweep: 0 },
+  clear: { c: [255, 214, 110], k: 1.15, sweep: 0 },
+};
+let mood = MOODS.idle, sunC = MOODS.idle.c.slice(), sunK = 1, sweepK = 0, sweepT = 0;
+window.__sunMood = (m) => { mood = MOODS[m] || MOODS.idle; };
+let SUN = sunC.map(Math.round).join(',');
 const RAYS = W < 600 ? 6 : 10;
 const rays = Array.from({ length: RAYS }, (_, i) => ({
   x: (i + rand(0.1, 0.9)) / RAYS, w: rand(0.03, 0.09), spread: rand(1.8, 3.4), slant: rand(0.08, 0.16),
   a: rand(0.05, 0.12), ph: rand(0, 6.3), sp: rand(18, 36), sw: rand(0.006, 0.02),
 }));
 function drawRays(t) {
+  // ease colour, brightness and sweep towards the current mood
+  const e = Math.min(1, 0.016 * 1.3 * 60 / 60);
+  for (let i = 0; i < 3; i++) sunC[i] += (mood.c[i] - sunC[i]) * 0.025;
+  sunK += (mood.k - sunK) * 0.025;
+  sweepK += (mood.sweep - sweepK) * 0.03;
+  sweepT += 0.016 * (0.4 + sweepK);
+  SUN = sunC.map(Math.round).join(',');
+  void e;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   // glare where the sun hits the surface
-  const gx = W * 0.32, glare = ctx.createRadialGradient(gx, -H * 0.05, 0, gx, -H * 0.05, Math.max(W, H) * 0.75);
-  glare.addColorStop(0, `rgba(${SUN},0.22)`);
-  glare.addColorStop(0.35, `rgba(${SUN},0.07)`);
+  const gx = W * (0.32 + sweepK * 0.3 * Math.sin(sweepT * 0.9)), glare = ctx.createRadialGradient(gx, -H * 0.05, 0, gx, -H * 0.05, Math.max(W, H) * 0.75);
+  glare.addColorStop(0, `rgba(${SUN},${0.22 * sunK})`);
+  glare.addColorStop(0.35, `rgba(${SUN},${0.07 * sunK})`);
   glare.addColorStop(1, `rgba(${SUN},0)`);
   ctx.fillStyle = glare;
   ctx.fillRect(0, 0, W, H);
   for (const r of rays) {
     const breathe = 0.55 + 0.45 * Math.sin((t / r.sp) * 6.283 + r.ph);
-    const x0 = (r.x + Math.sin((t / (r.sp * 1.7)) * 6.283 + r.ph) * r.sw) * W;
+    const x0 = (r.x + Math.sin((t / (r.sp * 1.7)) * 6.283 + r.ph) * r.sw + sweepK * 0.14 * Math.sin(sweepT * 1.3 + r.ph)) * W;
     const w0 = r.w * W, w1 = w0 * r.spread, len = H * 1.05, dx = len * r.slant;
     const g = ctx.createLinearGradient(0, 0, 0, len);
-    g.addColorStop(0, `rgba(${SUN},${r.a * breathe})`);
-    g.addColorStop(0.5, `rgba(${SUN},${r.a * breathe * 0.35})`);
+    const lift = sunK * (1 + sweepK * 0.6 * Math.max(0, Math.sin(sweepT * 2.1 + r.ph * 3)));
+    g.addColorStop(0, `rgba(${SUN},${Math.min(0.5, r.a * breathe * lift)})`);
+    g.addColorStop(0.5, `rgba(${SUN},${Math.min(0.25, r.a * breathe * 0.35 * lift)})`);
     g.addColorStop(1, `rgba(${SUN},0)`);
     ctx.fillStyle = g;
     ctx.beginPath();

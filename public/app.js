@@ -62,6 +62,9 @@
     if (kind === 'busy') { var s = document.createElement('span'); s.className = 'spin'; el.append(s); }
     if (msg) el.append(msg);
   }
+  // The light reacts to scans only on the demo link until it's approved for everyone.
+  var DEMO_LIGHT = /[?&]demo=light/.test(location.search);
+  function mood(m) { if (DEMO_LIGHT && window.__sunMood) window.__sunMood(m); }
   function busy(on) { $('go').disabled = on; $('go').textContent = on ? 'Scanning…' : 'Scan it'; }
 
   // ---------- scanning
@@ -77,7 +80,7 @@
     var v = $('repo').value.trim();
     var r = parseRepo(v);
     if (!r) { status(r === null ? 'Paste a GitHub link first, or drop the zip.' : "That isn't a GitHub repo link.", 'err'); $('repo').focus(); return; }
-    busy(true); status('Downloading and reading the files. Usually a few seconds.', 'busy');
+    busy(true); mood('scan'); status('Downloading and reading the files. Usually a few seconds.', 'busy');
     post('/api/scan', JSON.stringify({ url: v }), { 'content-type': 'application/json' })
       .then(done).catch(fail);
   }
@@ -85,7 +88,7 @@
     if (!f) return;
     if (f.size > 25 * 1024 * 1024) { status('That file is over 25 MB. Coding tests are usually much smaller.', 'err'); return; }
     if (!/\.(zip|tgz|tar\.gz|gz)$/i.test(f.name)) { status('Drop a .zip of the project.', 'err'); return; }
-    busy(true); status('Reading ' + f.name + '…', 'busy');
+    busy(true); mood('scan'); status('Reading ' + f.name + '…', 'busy');
     post('/api/upload', f, { 'content-type': 'application/octet-stream', 'x-filename': encodeURIComponent(f.name) })
       .then(done).catch(fail);
   }
@@ -95,7 +98,7 @@
     try { history.pushState({ id: r.id }, '', '/r/' + r.id); } catch (e) {}
     $('result').scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'start' });
   }
-  function fail(e) { busy(false); status(e.message || 'Scan failed.', 'err'); }
+  function fail(e) { busy(false); mood('idle'); status(e.message || 'Scan failed.', 'err'); }
 
   $('scanForm').addEventListener('submit', function (e) { e.preventDefault(); scanLink(); });
   $('pick').addEventListener('click', function () { $('file').click(); });
@@ -117,6 +120,7 @@
 
   function render(r) {
     current = r;
+    mood(r.verdict);
     $('result').hidden = false;
     $('verdict').className = 'verdict ' + r.verdict;
     $('headline').textContent = r.headline;
@@ -168,7 +172,7 @@
     else prompt('Copy this link', link);
   });
   $('again').addEventListener('click', function () {
-    $('result').hidden = true; current = null; $('repo').value = ''; liveHint();
+    $('result').hidden = true; current = null; mood('idle'); $('repo').value = ''; liveHint();
     try { history.pushState({}, '', '/'); } catch (e) {}
     window.scrollTo({ top: 0, behavior: reduced ? 'auto' : 'smooth' }); $('repo').focus();
   });
@@ -185,5 +189,20 @@
   }
   window.addEventListener('popstate', loadFromPath);
   loadFromPath();
-})();
 
+  // ---------- demo of the light (only with ?demo=light)
+  if (/[?&]demo=light/.test(location.search)) {
+    var bar = el('div', 'demo-bar');
+    bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', 'Light demo');
+    bar.append(el('span', 'demo-lbl', 'Light demo'));
+    [['scan', 'Scanning'], ['red', 'Red flags'], ['amber', 'Worth checking'], ['clear', 'No known red flags'], ['idle', 'Resting']].forEach(function (b) {
+      var x = el('button', 'demo-b', b[1]); x.type = 'button';
+      x.addEventListener('click', function () {
+        bar.querySelectorAll('button').forEach(function (o) { o.setAttribute('aria-pressed', o === x ? 'true' : 'false'); });
+        mood(b[0]);
+      });
+      bar.append(x);
+    });
+    document.body.append(bar);
+  }
+})();
