@@ -7,7 +7,7 @@
 <meta name="description" content="Got a coding test from a recruiter? Scan it before you run it. Free, takes seconds, never runs the code.">
 <meta property="og:title" content="$SNIFF: scan a coding test before you run it">
 <meta property="og:description" content="Flags the tricks used in fake-recruiter attacks, including the one behind the Binance hack. Free and it never runs the code.">
-<meta name="theme-color" content="#070706">
+<meta name="theme-color" content="#02060f">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<div class="bg" aria-hidden="true"><div class="bg-grid"></div><canvas class="bg-rain" id="rain"></canvas><div class="bg-glow g1"></div><div class="bg-glow g2"></div></div>
 <div id="drop" aria-hidden="true"><span>Drop the zip to scan it</span></div>
 
 <header class="top wrap">
@@ -23,19 +24,19 @@
 </header>
 
 <main class="wrap">
-  <section class="hero">
+  <section class="hero rise d1">
     <h1>Got a coding test from a recruiter? Scan it before you run it.</h1>
     <p class="sub">Free. Takes about 30 seconds. Flags the tricks used in fake-recruiter attacks, including the one behind the Binance hack. We read the files and never run them.</p>
   </section>
 
-  <form id="scanForm" class="gf-grid" autocomplete="off" novalidate>
+  <form id="scanForm" class="gf-grid rise d2" autocomplete="off" novalidate>
     <label class="gf-cell c6">
       <span class="gf-lbl">GitHub link</span>
       <input class="gf-val url" id="repo" type="text" inputmode="url" spellcheck="false" placeholder="github.com/company/take-home-test" aria-describedby="repoHint">
       <span class="gf-hint" id="repoHint" aria-live="polite">Paste the link the recruiter sent. Public repos only; for anything else, use the zip.</span>
     </label>
   </form>
-  <div class="actions">
+  <div class="actions rise d3">
     <button class="gf-btn" id="go" type="submit" form="scanForm">Scan it</button>
     <button class="lnk" id="pick" type="button">or drop the zip here</button>
     <input id="file" type="file" accept=".zip,.tgz,.gz,application/zip" hidden>

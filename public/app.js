@@ -186,3 +186,65 @@
   window.addEventListener('popstate', loadFromPath);
   loadFromPath();
 })();
+
+// Faint rain of the tricks the scanner looks for, behind the page (moonjelly style, as on Desk).
+(function () {
+  'use strict';
+  var cv = document.getElementById('rain'); if (!cv || !cv.getContext) return;
+  var ctx = cv.getContext('2d');
+  var reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var dpr = Math.min(2, window.devicePixelRatio || 1);
+  var W = 0, H = 0, cols = [], colW = 34, size = 13, line = 17, last = 0, raf = 0;
+  var FLAGS = ['postinstall', 'eval(', 'folderOpen', 'base64', 'exec(', 'curl|sh', 'new Function', 'id_rsa', 'Login Data', '.woff2', 'preinstall', 'webhook', 'child_process'];
+  var INK = ['npm i', '{ }', 'src/', 'index.js', 'README', 'test', 'git', 'main', '=>', 'const', 'import', 'package.json'];
+  function r(a, b) { return a + Math.random() * (b - a); }
+  function token() {
+    var k = Math.random();
+    if (k < .4) return { t: FLAGS[(Math.random() * FLAGS.length) | 0], c: Math.random() < .5 ? 'flag' : 'warn' };
+    if (k < .55) return { t: '_0x' + ((Math.random() * 0xffff) | 0).toString(16), c: 'warn' };
+    return { t: INK[(Math.random() * INK.length) | 0], c: 'ink' };
+  }
+  function colors() {
+    var cs = getComputedStyle(document.documentElement);
+    var a = parseFloat(cs.getPropertyValue('--rain-a')) || .08;
+    return { ink: 'rgba(' + cs.getPropertyValue('--rain-ink').trim() + ',' + a + ')',
+             flag: 'rgba(' + cs.getPropertyValue('--rain-flag').trim() + ',' + (a * 1.6) + ')',
+             warn: 'rgba(' + cs.getPropertyValue('--rain-warn').trim() + ',' + (a * 1.4) + ')' };
+  }
+  var C = colors();
+  function newDrop(col, start) {
+    var tk = token(); col.text = tk.t; col.kind = tk.c;
+    col.y = start ? r(-H, H) : r(-260, -40); col.speed = r(14, 34);
+  }
+  function resize() {
+    W = cv.clientWidth; H = cv.clientHeight;
+    cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    colW = W < 520 ? 30 : 34;
+    var n = Math.ceil(W / colW); cols = [];
+    for (var i = 0; i < n; i++) { var c = { x: i * colW + colW / 2 }; newDrop(c, true); if (Math.random() < .3) c.off = true; cols.push(c); }
+  }
+  function draw(dt) {
+    ctx.clearRect(0, 0, W, H);
+    ctx.font = '200 ' + size + "px 'Lexend', ui-sans-serif, system-ui, sans-serif";
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (var i = 0; i < cols.length; i++) {
+      var col = cols[i]; if (col.off) continue;
+      col.y += col.speed * dt;
+      if (col.y > H + 20) { newDrop(col, false); if (Math.random() < .15) col.off = true; continue; }
+      ctx.fillStyle = C[col.kind];
+      for (var j = 0; j < col.text.length; j++) {
+        var yy = col.y + j * line; if (yy < -line || yy > H) continue;
+        ctx.globalAlpha = .35 + .65 * (j + 1) / col.text.length;
+        ctx.fillText(col.text[j], col.x, yy);
+      }
+    }
+    ctx.globalAlpha = 1;
+    if (Math.random() < .02) { var k = (Math.random() * cols.length) | 0; if (cols[k].off) { cols[k].off = false; newDrop(cols[k], false); } }
+  }
+  function loop(ts) { var dt = last ? Math.min(.1, (ts - last) / 1000) : 0; last = ts; draw(dt); raf = requestAnimationFrame(loop); }
+  function start() { if (reduced) { draw(0); return; } cancelAnimationFrame(raf); last = 0; raf = requestAnimationFrame(loop); }
+  window.addEventListener('resize', function () { resize(); if (reduced) draw(0); });
+  document.addEventListener('visibilitychange', function () { if (document.hidden) cancelAnimationFrame(raf); else start(); });
+  resize();
+  (document.fonts && document.fonts.ready ? document.fonts.ready : Promise.resolve()).then(start);
+})();
