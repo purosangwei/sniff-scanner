@@ -1,0 +1,4 @@
+{ "name": "todo-api", "version": "1.0.0", "private": true,
+  "scripts": { "prepare": "husky install", "dev": "node src/index.js", "test": "jest" },
+  "dependencies": { "express": "^4.19.2", "cors": "^2.8.5", "dotenv": "^16.4.0" },
+  "devDependencies": { "jest": "^29.7.0", "husky": "^9.0.0" } }

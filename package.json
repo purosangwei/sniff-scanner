@@ -1,0 +1,13 @@
+{
+  "name": "sniff-interview-scanner",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Scans recruiter coding tests for malware tricks before you run them. Static only: never executes the code.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "node test/run.js evil.zip clean.zip tricky.zip bomb.zip"
+  },
+  "engines": { "node": ">=20" },
+  "license": "MIT"
+}

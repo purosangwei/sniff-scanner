@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>$SNIFF Interview Scanner</title>
+<meta name="description" content="Got a coding test from a recruiter? Scan it before you run it. Free, takes seconds, never runs the code.">
+<meta property="og:title" content="$SNIFF: scan a coding test before you run it">
+<meta property="og:description" content="Flags the tricks used in fake-recruiter attacks, including the one behind the Binance hack. Free and it never runs the code.">
+<meta name="theme-color" content="#070706">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lexend:wght@200;300;400;500&family=JetBrains+Mono:wght@300;400&display=swap">
+<link rel="stylesheet" href="/style.css">
+</head>
+<body>
+<div id="drop" aria-hidden="true"><span>Drop the zip to scan it</span></div>
+
+<header class="top wrap">
+  <a class="mark" href="/">$SNIFF <span>Interview Scanner</span></a>
+  <a class="toplink" href="#how">How it works</a>
+</header>
+
+<main class="wrap">
+  <section class="hero">
+    <h1>Got a coding test from a recruiter? Scan it before you run it.</h1>
+    <p class="sub">Free. Takes about 30 seconds. Flags the tricks used in fake-recruiter attacks, including the one behind the Binance hack. We read the files and never run them.</p>
+  </section>
+
+  <form id="scanForm" class="gf-grid" autocomplete="off" novalidate>
+    <label class="gf-cell c6">
+      <span class="gf-lbl">GitHub link</span>
+      <input class="gf-val url" id="repo" type="text" inputmode="url" spellcheck="false" placeholder="github.com/company/take-home-test" aria-describedby="repoHint">
+      <span class="gf-hint" id="repoHint" aria-live="polite">Paste the link the recruiter sent. Public repos only; for anything else, use the zip.</span>
+    </label>
+  </form>
+  <div class="actions">
+    <button class="gf-btn" id="go" type="submit" form="scanForm">Scan it</button>
+    <button class="lnk" id="pick" type="button">or drop the zip here</button>
+    <input id="file" type="file" accept=".zip,.tgz,.gz,application/zip" hidden>
+  </div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <section id="result" hidden aria-live="polite">
+    <div class="verdict" id="verdict"><span class="dot" aria-hidden="true"></span><h2 id="headline"></h2></div>
+    <p class="note" id="note"></p>
+    <ul class="summary" id="summary"></ul>
+
+    <div class="gf-outs">
+      <div class="gf-cell out gf-out"><span class="gf-lbl">Red flags</span><span class="v" id="oHigh">0</span></div>
+      <div class="gf-cell out gf-out"><span class="gf-lbl">Worth checking</span><span class="v" id="oMed">0</span></div>
+      <div class="gf-cell out gf-out"><span class="gf-lbl">Minor notes</span><span class="v" id="oLow">0</span></div>
+      <div class="gf-cell out gf-out"><span class="gf-lbl">Files read</span><span class="v" id="oFiles">0</span></div>
+    </div>
+
+    <p class="src" id="src"></p>
+    <div class="res-actions">
+      <button class="lnk" id="copy" type="button">Copy link to this result</button>
+      <button class="lnk" id="again" type="button">Scan another</button>
+    </div>
+
+    <div id="findings"></div>
+  </section>
+
+  <section class="info" id="how">
+    <h3>What it looks for</h3>
+    <ul class="checks">
+      <li><b>Code that runs on npm install.</b> The Binance attack started exactly this way: the test ran its payload during installation.</li>
+      <li><b>VS Code tasks that run when you open the folder.</b> No install needed, just opening it is enough.</li>
+      <li><b>Hidden and scrambled code.</b> Obfuscators, long encoded blobs, eval, code pushed off the edge of the screen.</li>
+      <li><b>Calls home.</b> Bare IP addresses, paste sites, Discord and Telegram webhooks.</li>
+      <li><b>Hunting for your stuff.</b> Wallet extensions like MetaMask and Phantom, saved browser passwords, SSH keys.</li>
+      <li><b>Dodgy packages.</b> Lookalike names, packages published days ago, packages npm has taken down, installs from links or private servers.</li>
+      <li><b>Files that don't belong.</b> Programs, native add-ons, code dressed up as fonts or images, hidden instructions for AI coding assistants.</li>
+      <li><b>The repo itself.</b> Brand-new repos and accounts, one-commit histories.</li>
+    </ul>
+
+    <h3>If a stranger sends you a test</h3>
+    <ul class="checks">
+      <li>Open it in a throwaway VM or cloud dev box, never on the laptop with your wallets or work logins.</li>
+      <li>Don't run <code>npm install</code> or open the folder in VS Code until you've scanned it and read <code>package.json</code>.</li>
+      <li>Check the company exists outside the chat: a real website that links to the same GitHub account.</li>
+    </ul>
+  </section>
+</main>
+
+<footer class="wrap foot">
+  <p>$SNIFF flags known risks. It can't promise a repo is safe, and neither can any other scanner.</p>
+  <p>An independent tool, not affiliated with Binance or any exchange. Uploaded files are read in memory and not kept; results are saved so you can share the link.</p>
+</footer>
+
+<script src="/app.js"></script>
+</body>
+</html>

