@@ -240,3 +240,34 @@ body.dragging #drop{ display:flex; }
 :root{ --glow:rgba(255,170,40,.22); --glow-core:rgba(255,206,140,.32);
   --ghost:0 0 1px rgba(255,244,222,.55), 0 0 14px var(--glow-core), 0 0 38px var(--glow); }
 .eyebrow{ text-shadow:0 0 12px color-mix(in srgb, var(--accent-soft) 45%, transparent); }
+
+/* ---------- count tiles open a typed list ---------- */
+button.tile{ -webkit-appearance:none; appearance:none; font:inherit; color:inherit; text-align:left; width:100%; text-shadow:inherit; }
+.gf-cell.out.tile{ cursor:pointer; }
+button.tile .gf-lbl{ display:flex; align-items:center; gap:8px; }
+button.tile .gf-lbl i{ width:6px; height:6px; border-right:1.3px solid currentColor; border-bottom:1.3px solid currentColor; transform:rotate(45deg) translateY(-2px); opacity:.6; transition:transform .5s cubic-bezier(.16,1,.3,1), opacity .3s; }
+button.tile:hover .gf-lbl i{ opacity:1; }
+button.tile[aria-expanded="true"]{ border-color:rgba(var(--accent-rgb),.6); background:rgba(var(--accent-rgb),.05); box-shadow:0 0 0 3px rgba(var(--accent-rgb),.12), 0 0 44px -10px rgba(var(--accent-rgb),.7); }
+button.tile[aria-expanded="true"] .gf-lbl i{ transform:rotate(225deg) translate(-2px,-1px); opacity:1; }
+button.tile:focus-visible{ outline:none; border-color:rgba(var(--accent-rgb),.75); box-shadow:0 0 0 3px rgba(var(--accent-rgb),.2); }
+/* the opened list is glow fields too: invisible rows that light up under the pointer */
+.tile-panel{ margin:14px -18px 0; }
+@media (max-width:480px){ .tile-panel{ margin:14px -14px 0; } }
+.tile-panel .row.gf-cell{ display:grid; grid-template-columns:12px minmax(0,1fr); gap:14px; padding:16px 18px; border-radius:16px; border:1px solid transparent; margin-bottom:2px; }
+.tile-panel .row.gf-cell:hover{ border-color:rgba(var(--accent-rgb),.32); }
+.tile-panel .tile-none{ padding:0 18px; }
+.tile-none{ color:var(--ink-dim); margin:14px 0 0; min-height:1.5em; }
+.typing::after{ content:""; display:inline-block; width:6px; height:1em; margin-left:2px; vertical-align:-2px; background:var(--accent); box-shadow:0 0 8px rgba(var(--accent-rgb),.8); }
+.fade{ animation:tfade .6s cubic-bezier(.16,1,.3,1) both; }
+@keyframes tfade{ from{ opacity:0; transform:translateY(4px); } to{ opacity:1; transform:none; } }
+.filelist{ list-style:none; margin:0; padding:4px 0; font:300 13px/1.5 var(--mono); max-height:440px; overflow:auto; }
+.filelist li.gf-cell{ display:grid; grid-template-columns:10px minmax(0,1fr) auto; gap:12px; align-items:center; padding:8px 18px; border-radius:12px; color:var(--ink-dim); text-shadow:none; }
+.filelist li.gf-cell::before{ background:radial-gradient(220px circle at var(--mx) var(--my), rgba(var(--accent-rgb),.22), rgba(var(--accent-rgb),0) 70%); }
+.filelist .fname{ min-width:0; overflow-wrap:anywhere; }
+.filelist .fsize{ color:var(--ink-faint); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.filelist .fdot{ width:6px; height:6px; border-radius:50%; background:rgba(var(--ink-rgb),.18); }
+.filelist .has.high .fdot{ background:var(--high); box-shadow:0 0 8px rgba(var(--high-rgb),.7); }
+.filelist .has.medium .fdot{ background:var(--med); }
+.filelist .has.low .fdot, .filelist .has.info .fdot{ background:var(--ink-dim); }
+.filelist .has.high .fname{ color:var(--ink); }
+@media (prefers-reduced-motion:reduce){ .fade{ animation:none; } .typing::after{ display:none; } }

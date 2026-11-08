@@ -149,6 +149,7 @@
     src.append(' · ' + r.coverage.files + ' files, ' + r.coverage.deps + ' dependencies');
     if (r.coverage.registryChecked) src.append(', ' + r.coverage.registryChecked + ' looked up on npm');
 
+    closeTile();
     // start folded: verdict and counts only, details one click away
     var total = r.findings.length;
     setDetails(false);
@@ -175,6 +176,74 @@
     });
     if (r.truncatedFindings) box.append(el('p', 'more', '+' + r.truncatedFindings + ' more findings not shown.'));
   }
+
+  // ---------- count tiles: click one to type out just that list
+  var tileRun = 0, openGroup = null;
+  var TILE_NAMES = { high: 'red flags', medium: 'things worth checking', low: 'minor notes' };
+  function sleep(ms) { return new Promise(function (ok) { setTimeout(ok, ms); }); }
+  function typeText(node, text, run, perChar) {
+    if (reduced) { node.textContent = text; return Promise.resolve(); }
+    node.classList.add('typing');
+    return new Promise(function (done) {
+      var i = 0, step = Math.max(1, Math.ceil(text.length / 40));   // long lines type in chunks so nothing drags
+      (function tick() {
+        if (run !== tileRun) return done();
+        i = Math.min(text.length, i + step);
+        node.textContent = text.slice(0, i);
+        if (i < text.length) setTimeout(tick, perChar);
+        else { node.classList.remove('typing'); done(); }
+      })();
+    });
+  }
+  function closeTile() {
+    tileRun++; openGroup = null;
+    document.querySelectorAll('.tile').forEach(function (t) { t.setAttribute('aria-expanded', 'false'); });
+    var p = $('tilePanel'); p.hidden = true; p.textContent = '';
+  }
+  function openTile(group) {
+    var r = current; if (!r) return;
+    var run = ++tileRun; openGroup = group;
+    document.querySelectorAll('.tile').forEach(function (t) { t.setAttribute('aria-expanded', t.dataset.group === group ? 'true' : 'false'); });
+    var p = $('tilePanel'); p.textContent = ''; p.hidden = false; p.className = 'tile-panel ' + group;
+    if (window.__lenis && window.__lenis.resize) window.__lenis.resize();
+    if (group === 'files') return typeFiles(r, p, run);
+    var items = r.findings.filter(function (f) { return group === 'low' ? (f.severity === 'low' || f.severity === 'info') : f.severity === group; });
+    if (!items.length) { var none = el('p', 'tile-none'); p.append(none); return typeText(none, 'No ' + TILE_NAMES[group] + ' in this scan.', run, 22); }
+    (async function () {
+      for (var k = 0; k < items.length; k++) {
+        if (run !== tileRun) return;
+        var f = items[k];
+        var row = el('div', 'gf-cell out row ' + f.severity + ' typed'); row.append(el('span', 'sev'));
+        var body = el('div'), t = el('div', 't'); body.append(t); row.append(body); p.append(row);
+        await typeText(t, f.title, run, 16);
+        if (run !== tileRun) return;
+        if (f.file) body.append(el('div', 'm fade', f.file + (f.line ? ':' + f.line : '')));
+        body.append(el('p', 'x fade', f.explain));
+        if (f.snippet) body.append(el('code', 'snip fade', f.snippet));
+        if (f.more) body.append(el('div', 'more fade', '+' + f.more + ' more like this in the same file'));
+        if (!reduced) await sleep(k < 6 ? 140 : 40);
+      }
+    })();
+  }
+  function fmtSize(n) { return n >= 1048576 ? (n / 1048576).toFixed(1) + ' MB' : n >= 1024 ? Math.round(n / 1024) + ' KB' : n + ' B'; }
+  function typeFiles(r, p, run) {
+    var list = r.fileList;
+    if (!list) { var old = el('p', 'tile-none'); p.append(old); return typeText(old, 'This result was saved before file lists were kept. Scan it again to see every file.', run, 18); }
+    var ul = el('ul', 'filelist'); p.append(ul);
+    (async function () {
+      for (var k = 0; k < list.length; k++) {
+        if (run !== tileRun) return;
+        var f = list[k], li = el('li', 'gf-cell out' + (f.w ? ' has ' + f.w : ''));
+        var dot = el('span', 'fdot'); var name = el('span', 'fname'); var size = el('span', 'fsize', fmtSize(f.s));
+        li.append(dot, name, size); ul.append(li);
+        if (k < 60) await typeText(name, f.p, run, 9); else name.textContent = f.p;
+      }
+      if (r.coverage.files > list.length && run === tileRun) p.append(el('p', 'more', '+' + (r.coverage.files - list.length) + ' more files not listed.'));
+    })();
+  }
+  document.querySelectorAll('.tile').forEach(function (t) {
+    t.addEventListener('click', function () { if (openGroup === t.dataset.group) closeTile(); else openTile(t.dataset.group); });
+  });
 
   function setDetails(open) {
     $('details').hidden = !open;

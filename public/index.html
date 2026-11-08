@@ -57,12 +57,13 @@
       <section id="result" hidden aria-live="polite">
         <div class="verdict" id="verdict"><span class="dot" aria-hidden="true"></span><h2 id="headline"></h2></div>
         <p class="note" id="note"></p>
-        <div class="gf-outs">
-          <div class="gf-cell out gf-out"><span class="gf-lbl">Red flags</span><span class="v" id="oHigh">0</span></div>
-          <div class="gf-cell out gf-out"><span class="gf-lbl">Worth checking</span><span class="v" id="oMed">0</span></div>
-          <div class="gf-cell out gf-out"><span class="gf-lbl">Minor notes</span><span class="v" id="oLow">0</span></div>
-          <div class="gf-cell out gf-out"><span class="gf-lbl">Files read</span><span class="v" id="oFiles">0</span></div>
+        <div class="gf-outs" role="group" aria-label="Open a list">
+          <button type="button" class="gf-cell out gf-out tile" data-group="high" aria-expanded="false" aria-controls="tilePanel"><span class="gf-lbl">Red flags<i aria-hidden="true"></i></span><span class="v" id="oHigh">0</span></button>
+          <button type="button" class="gf-cell out gf-out tile" data-group="medium" aria-expanded="false" aria-controls="tilePanel"><span class="gf-lbl">Worth checking<i aria-hidden="true"></i></span><span class="v" id="oMed">0</span></button>
+          <button type="button" class="gf-cell out gf-out tile" data-group="low" aria-expanded="false" aria-controls="tilePanel"><span class="gf-lbl">Minor notes<i aria-hidden="true"></i></span><span class="v" id="oLow">0</span></button>
+          <button type="button" class="gf-cell out gf-out tile" data-group="files" aria-expanded="false" aria-controls="tilePanel"><span class="gf-lbl">Files read<i aria-hidden="true"></i></span><span class="v" id="oFiles">0</span></button>
         </div>
+        <div class="tile-panel" id="tilePanel" role="region" aria-live="polite" hidden></div>
         <p class="src" id="src"></p>
         <div class="res-actions">
           <button class="lnk" id="copy" type="button">Copy link to this result</button>
