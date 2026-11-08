@@ -460,6 +460,9 @@ const MOODS = {
 };
 let tintC = [255, 170, 30], tintK = 0, lastTint = '';
 const HAZE_BASE = { a: [240, 185, 11], b: [255, 140, 30] };
+// The page's text leans the same way, gently enough to stay easy to read: headings least,
+// grey text more, the small yellow labels most.
+const INK_BASE = { ink: [255, 234, 203], dim: [221, 194, 156], faint: [151, 123, 91], soft: [248, 211, 58], halo: [255, 170, 40] };
 const mixC = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
 let mood = MOODS.idle, sunC = MOODS.idle.c.slice(), sunK = 1, sweepK = 0, sweepT = 0;
 window.__sunMood = (m) => { mood = MOODS[m] || MOODS.idle; };
@@ -491,6 +494,18 @@ function drawRays(t) {
     const root = document.documentElement.style;
     root.setProperty('--tank-a', mixC(HAZE_BASE.a, tintC, tintK * 0.8).join(','));
     root.setProperty('--tank-b', mixC(HAZE_BASE.b, tintC, tintK * 0.8).join(','));
+    if (tintK > 0.01) {
+      const ink = mixC(INK_BASE.ink, tintC, tintK * 0.3), halo = mixC(INK_BASE.halo, tintC, tintK).join(',');
+      root.setProperty('--ink', `rgb(${ink.join(',')})`);
+      root.setProperty('--ink-rgb', ink.join(','));
+      root.setProperty('--ink-dim', `rgb(${mixC(INK_BASE.dim, tintC, tintK * 0.45).join(',')})`);
+      root.setProperty('--ink-faint', `rgb(${mixC(INK_BASE.faint, tintC, tintK * 0.5).join(',')})`);
+      root.setProperty('--accent-soft', `rgb(${mixC(INK_BASE.soft, tintC, tintK * 0.75).join(',')})`);
+      root.setProperty('--ghost', `0 0 1px rgba(255,244,222,.5), 0 0 14px rgba(${halo},.32), 0 0 38px rgba(${halo},.24)`);
+      root.setProperty('--ghost-soft', `0 0 10px rgba(${halo},.15), 0 0 28px rgba(${halo},.08)`);
+    } else {
+      for (const v of ['--ink', '--ink-rgb', '--ink-dim', '--ink-faint', '--accent-soft', '--ghost', '--ghost-soft']) root.removeProperty(v);
+    }
   }
   void e;
   ctx.save();

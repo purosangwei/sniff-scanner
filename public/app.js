@@ -64,7 +64,12 @@
   }
   // The light reacts to scans only on the demo link until it's approved for everyone.
   var DEMO_LIGHT = /[?&]demo=light/.test(location.search);
-  function mood(m) { if (DEMO_LIGHT && window.__sunMood) window.__sunMood(m); }
+  function mood(m) {
+    if (!DEMO_LIGHT) return;
+    if (window.__sunMood) window.__sunMood(m);
+    // the words take on the light's colour too (see [data-mood] in style.css)
+    document.documentElement.dataset.mood = m;
+  }
   function busy(on) { $('go').disabled = on; $('go').textContent = on ? 'Scanning…' : 'Scan it'; }
 
   // ---------- scanning

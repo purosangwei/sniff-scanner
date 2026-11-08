@@ -233,3 +233,10 @@ body.dragging #drop{ display:flex; }
 #details .summary{ margin-top:18px; }
 
 .verdict.red ~ #details .summary li::before{ background:var(--high); }
+
+/* ---------- text follows the verdict light ----------
+   motion.js eases --ink, --ink-dim, --ink-faint, --accent-soft, --glow and --glow-core along with the
+   water, so words and light change together. The Scan button keeps $SNIFF yellow. */
+:root{ --glow:rgba(255,170,40,.22); --glow-core:rgba(255,206,140,.32);
+  --ghost:0 0 1px rgba(255,244,222,.55), 0 0 14px var(--glow-core), 0 0 38px var(--glow); }
+.eyebrow{ text-shadow:0 0 12px color-mix(in srgb, var(--accent-soft) 45%, transparent); }
