@@ -63,7 +63,8 @@
     if (msg) el.append(msg);
   }
   // The light reacts to scans only on the demo link until it's approved for everyone.
-  var DEMO_LIGHT = /[?&]demo=light/.test(location.search);
+  // The light reacts to every scan now; ?demo=light only adds the button bar for showing it off.
+  var DEMO_LIGHT = true;
   function mood(m) {
     if (!DEMO_LIGHT) return;
     if (window.__sunMood) window.__sunMood(m);
