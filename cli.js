@@ -86,7 +86,7 @@ function print(r) {
   let report;
   if (target.startsWith('npm:')) {
     const p = await fetchNpm(target.slice(4));
-    report = await scanArchive(p.buf, p.label, opts);
+    report = await scanArchive(p.buf, p.label, Object.assign({}, opts, { asDependency: true, limits: { maxFiles: 40000, maxTotal: 400 * 1024 * 1024 } }));
     if (p.published) report.source.published = p.published;
   } else if (/github\.com\/|^[\w.-]+\/[\w.-]+$/.test(target) && !fs.existsSync(target)) {
     try { report = await scanGithub(target, opts); }

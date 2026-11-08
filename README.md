@@ -1,4 +1,4 @@
-# $SNIFF Interview Scanner
+# $SNIFF Coding Test Scanner
 
 Scans a recruiter's "take-home coding test" for the tricks used in fake-recruiter malware attacks, before you run it. Paste a GitHub link or drop a zip and get a red / amber / grey report in plain English.
 

@@ -94,6 +94,7 @@ const halo = (() => {
 const JELLY_COUNT = W < 600 ? 3 : 5;
 const DEPTHS = [0.95, 0.7, 0.48, 0.28, 0.12];
 const jellies = Array.from({ length: JELLY_COUNT }, (_, i) => newJelly(true, DEPTHS[i]));
+window.__jellies = jellies;
 function newJelly(anywhere, depth) {
   const z = depth ?? rand(0, 1); // 1 = close and sharp, 0 = far and out of focus
   // Far jellies are drawn small and scaled up, which blurs them like a camera's focus.
@@ -110,12 +111,54 @@ function newJelly(anywhere, depth) {
     tilt: rand(-0.5, 0.5), turn: rand(0, 6.3), yaw: rand(0, TAU), yawV: rand(-0.06, 0.06),
     pitch: rand(0.28, 0.5), pitchPh: rand(0, 6.3),
     v: rand(3, 6), beat: rand(7, 11), ph: rand(0, 10), a: 0.22 + 0.3 * z,
-    vx: 0, vy: 0, off, og: Object.assign(off.getContext('2d'), { imageSmoothingQuality: 'high' }), S, hist: [], f: 0, fv: 0,
+    vx: 0, vy: 0, goal: null, gvx: 0, gvy: 0, cool: 0, off, og: Object.assign(off.getContext('2d'), { imageSmoothingQuality: 'high' }), S, hist: [], f: 0, fv: 0,
     bloom, bg: bloom.getContext('2d'),
     tent: Array.from({ length: 30 }, () => ({ u: rand(0.02, 0.98), len: rand(0.5, 1.2), ph: rand(0, 6.3) })),
   };
 }
 const smooth = (x) => x * x * (3 - 2 * x);
+
+// Where the words are, so jellies can find open water. Re-measured as the page scrolls.
+const TEXT_SEL = 'h1, h2, h3, p, li, label, .gf-cell, .actions, .pane, .verdict, .summary, .drift, .brand, .toplink, .eyebrow, .row, .gf-outs, .res-actions, #trace';
+let textRects = [], rectsAt = 0;
+function measureText(now) {
+  if (now - rectsAt < 350) return;
+  rectsAt = now;
+  textRects = [];
+  for (const el of document.querySelectorAll(TEXT_SEL)) {
+    const r = el.getBoundingClientRect();
+    if (r.width > 0 && r.height > 0 && r.bottom > -100 && r.top < H + 100) textRects.push(r);
+  }
+}
+addEventListener('scroll', () => { rectsAt = 0; }, { passive: true });
+function textOverlap(x, y, rad) {
+  let a = 0;
+  for (const r of textRects) {
+    const w = Math.min(x + rad, r.right) - Math.max(x - rad, r.left);
+    const h = Math.min(y + rad, r.bottom) - Math.max(y - rad, r.top);
+    if (w > 0 && h > 0) a += w * h;
+  }
+  return a / (4 * rad * rad);
+}
+// Try spots around the jelly, mostly away from the pointer, and keep the one with the least text
+// under it; closer spots win ties so the move stays short and natural.
+function openSpot(j, px, py) {
+  measureText(performance.now());
+  const rad = j.size * 0.32, m = rad * 0.8;
+  const away = Math.atan2(j.y - py, j.x - px);
+  let best = null, bestScore = Infinity;
+  for (let i = 0; i < 28; i++) {
+    const ang = away + (Math.random() - 0.5) * Math.PI * 1.3;
+    const dist = 150 + Math.random() * 260;
+    const x = Math.max(m, Math.min(W - m, j.x + Math.cos(ang) * dist));
+    const y = Math.max(m, Math.min(H - m, j.y + Math.sin(ang) * dist));
+    const fromPtr = Math.hypot(x - px, y - py);
+    if (fromPtr < 200) continue;
+    const score = textOverlap(x, y, rad) * 4 + Math.hypot(x - j.x, y - j.y) / 900;
+    if (score < bestScore) { bestScore = score; best = { x, y }; }
+  }
+  return best;
+}
 
 function drawJelly(j, t, dt) {
   // --- swim: a gentle squeeze, then a long slow release
@@ -126,11 +169,34 @@ function drawJelly(j, t, dt) {
   j.tilt = Math.max(-0.7, Math.min(0.7, j.tilt));
   j.yaw += j.yawV * dt;
   const pitch = j.pitch + Math.sin(t * 0.07 + j.pitchPh) * 0.08;
-  const sp = (j.v * (0.4 + j.z) + thrust) * dt;
+  // Its own slow upward swim, eased right down while it's gliding somewhere.
+  const sp = (j.v * (0.4 + j.z) + thrust) * dt * (j.goal ? 0.25 : 1);
   j.x += Math.sin(j.tilt) * sp;
   j.y -= Math.cos(j.tilt) * sp;
+  // When the pointer comes close, it doesn't get shoved away: it picks a nearby patch of open
+  // water with no text in it and glides over there, turning to face the way it's going.
   const dx = j.x - mouseX, dy = j.y - mouseY, d = Math.hypot(dx, dy);
-  if (d < 260 && d > 1) { j.vx += (dx / d) * (1 - d / 260) * 22 * dt; j.vy += (dy / d) * (1 - d / 260) * 22 * dt; }
+  j.cool = Math.max(0, (j.cool || 0) - dt);
+  if (d < 220 && !j.cool && (!j.goal || Math.hypot(j.goal.x - mouseX, j.goal.y - mouseY) < 200)) {
+    j.goal = openSpot(j, mouseX, mouseY);
+    j.cool = 1.2;
+  }
+  if (j.goal) {
+    const gx = j.goal.x - j.x, gy = j.goal.y - j.y, gd = Math.hypot(gx, gy);
+    // a soft spring with plenty of drag: it eases out, drifts, and settles over a few seconds
+    j.gvx = (j.gvx || 0) + (gx * 0.9 - (j.gvx || 0) * 1.7) * dt;
+    j.gvy = (j.gvy || 0) + (gy * 0.9 - (j.gvy || 0) * 1.7) * dt;
+    const s2 = Math.hypot(j.gvx, j.gvy), cap = 70 + 50 * j.z;
+    if (s2 > cap) { j.gvx *= cap / s2; j.gvy *= cap / s2; }
+    // lean into the direction of travel, the way a jelly steers with its bell
+    const face = Math.max(-0.7, Math.min(0.7, Math.atan2(j.gvx, -j.gvy) * 0.6));
+    j.tilt += (face - j.tilt) * Math.min(1, 0.9 * dt) * Math.min(1, s2 / 30);
+    if (gd < 14 && s2 < 6) { j.goal = null; }
+  } else if (j.gvx || j.gvy) {
+    j.gvx *= 1 - Math.min(1, 1.5 * dt); j.gvy *= 1 - Math.min(1, 1.5 * dt);
+    if (Math.abs(j.gvx) + Math.abs(j.gvy) < 0.5) j.gvx = j.gvy = 0;
+  }
+  j.x += (j.gvx || 0) * dt; j.y += (j.gvy || 0) * dt;
   // The big close one keeps to the right, out from behind the text.
   if (j.z > 0.66 && W >= 600) {
     const lane = 0.64 * W;
