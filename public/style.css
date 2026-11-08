@@ -271,3 +271,18 @@ button.tile:focus-visible{ outline:none; border-color:rgba(var(--accent-rgb),.75
 .filelist .has.low .fdot, .filelist .has.info .fdot{ background:var(--ink-dim); }
 .filelist .has.high .fname{ color:var(--ink); }
 @media (prefers-reduced-motion:reduce){ .fade{ animation:none; } .typing::after{ display:none; } }
+
+/* ---------- compact finding rows ---------- */
+.row .head{ display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; }
+.row .cnt{ font:300 12.5px var(--gf-font); color:var(--ink-faint); }
+.row .x{ margin:4px 0 0; font-size:14px; line-height:1.5; }
+.locs{ list-style:none; margin:8px 0 0; padding:0; display:flex; flex-direction:column; gap:4px; }
+.loc{ display:flex; flex-wrap:wrap; align-items:baseline; gap:4px 12px; font:300 13px/1.45 var(--gf-font); min-width:0; }
+.loc .where{ font-family:var(--mono); font-size:12.5px; color:var(--ink-dim); overflow-wrap:anywhere; }
+.loc .meta{ color:var(--ink-faint); font-size:12.5px; }
+.loc .lx{ flex-basis:100%; color:var(--ink-faint); font-size:13px; }
+.loc .snip1{ flex-basis:100%; display:block; min-width:0; font:300 12px/1.5 var(--mono); color:var(--ink-faint); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; cursor:pointer; border-left:1px solid var(--edge-2, rgba(255,234,203,.2)); padding-left:10px; }
+.loc .snip1:hover{ color:var(--ink-dim); border-left-color:rgba(var(--accent-rgb),.6); }
+.loc .snip1.open{ white-space:pre-wrap; overflow-wrap:anywhere; }
+.tile-panel .row.gf-cell{ padding:12px 18px; margin-bottom:0; }
+#details .row{ padding:12px 0; }

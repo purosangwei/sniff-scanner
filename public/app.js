@@ -161,20 +161,52 @@
       var items = r.findings.filter(function (f) { return f.severity === g[0]; });
       if (!items.length) return;
       var sec = el('div', 'group'); sec.append(el('h3', null, g[1] + ' (' + items.length + ')'));
-      items.forEach(function (f) {
-        var row = el('div', 'row ' + f.severity);
-        row.append(el('span', 'sev'));
-        var body = el('div');
-        body.append(el('div', 't', f.title));
-        if (f.file) body.append(el('div', 'm', f.file + (f.line ? ':' + f.line : '')));
-        body.append(el('p', 'x', f.explain));
-        if (f.snippet) body.append(el('code', 'snip', f.snippet));
-        if (f.more) body.append(el('div', 'more', '+' + f.more + ' more like this in the same file'));
-        row.append(body); sec.append(row);
+      groupByTitle(items).forEach(function (g) {
+        var b = buildRow(g, 'row'); b.t.textContent = b.title; b.rest.forEach(function (n) { b.body.append(n); }); sec.append(b.row);
       });
       box.append(sec);
     });
     if (r.truncatedFindings) box.append(el('p', 'more', '+' + r.truncatedFindings + ' more findings not shown.'));
+  }
+
+  // ---------- compact rows: the same finding in several files becomes one row,
+  // explained once, with one short line per file
+  function groupByTitle(items) {
+    var out = [], at = {};
+    items.forEach(function (f) {
+      var key = f.severity + '|' + f.title;
+      if (!(key in at)) { at[key] = out.length; out.push([]); }
+      out[at[key]].push(f);
+    });
+    return out;
+  }
+  function stripFile(f) { return f.file ? f.explain.split(f.file).join('this file') : f.explain; }
+  function buildRow(g, cls) {
+    var f0 = g[0], same = g.every(function (f) { return stripFile(f) === stripFile(f0); });
+    var row = el('div', cls + ' ' + f0.severity); row.append(el('span', 'sev'));
+    var body = el('div'), head = el('div', 'head'), t = el('span', 't');
+    head.append(t); if (g.length > 1) head.append(el('span', 'cnt', g.length + ' files'));
+    body.append(head); row.append(body);
+    var rest = [];
+    if (same) rest.push(el('p', 'x', g.length > 1 ? stripFile(f0) : f0.explain));
+    var locs = el('ul', 'locs');
+    g.forEach(function (f) {
+      if (!f.file && !f.snippet && same) return;
+      var li = el('li', 'loc');
+      if (f.file) li.append(el('span', 'where', f.file + (f.line ? ':' + f.line : '')));
+      var snip = f.snippet ? String(f.snippet) : '';
+      if (snip && snip.length <= 16 && !/[(){};=]/.test(snip)) li.append(el('span', 'meta', snip));   // sizes and short notes sit inline
+      if (f.more) li.append(el('span', 'meta', '+' + f.more + ' more here'));
+      if (!same) li.append(el('span', 'lx', f.explain));
+      if (snip && !(snip.length <= 16 && !/[(){};=]/.test(snip))) {
+        var c = el('code', 'snip1', snip); li.append(c);
+        c.title = 'Click to see the whole line';
+        c.addEventListener('click', function () { c.classList.toggle('open'); });
+      }
+      locs.append(li);
+    });
+    if (locs.childNodes.length) rest.push(locs);
+    return { row: row, body: body, t: t, title: f0.title, rest: rest };
   }
 
   // ---------- count tiles: click one to type out just that list
@@ -210,17 +242,13 @@
     var items = r.findings.filter(function (f) { return group === 'low' ? (f.severity === 'low' || f.severity === 'info') : f.severity === group; });
     if (!items.length) { var none = el('p', 'tile-none'); p.append(none); return typeText(none, 'No ' + TILE_NAMES[group] + ' in this scan.', run, 22); }
     (async function () {
-      for (var k = 0; k < items.length; k++) {
+      var groups = groupByTitle(items);
+      for (var k = 0; k < groups.length; k++) {
         if (run !== tileRun) return;
-        var f = items[k];
-        var row = el('div', 'gf-cell out row ' + f.severity + ' typed'); row.append(el('span', 'sev'));
-        var body = el('div'), t = el('div', 't'); body.append(t); row.append(body); p.append(row);
-        await typeText(t, f.title, run, 16);
+        var b = buildRow(groups[k], 'gf-cell out row typed'); p.append(b.row);
+        await typeText(b.t, b.title, run, 16);
         if (run !== tileRun) return;
-        if (f.file) body.append(el('div', 'm fade', f.file + (f.line ? ':' + f.line : '')));
-        body.append(el('p', 'x fade', f.explain));
-        if (f.snippet) body.append(el('code', 'snip fade', f.snippet));
-        if (f.more) body.append(el('div', 'more fade', '+' + f.more + ' more like this in the same file'));
+        b.rest.forEach(function (n) { n.classList.add('fade'); b.body.append(n); });
         if (!reduced) await sleep(k < 6 ? 140 : 40);
       }
     })();
