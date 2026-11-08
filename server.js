@@ -64,7 +64,7 @@ const SEC_HEADERS = {
   'x-content-type-options': 'nosniff',
   'referrer-policy': 'strict-origin-when-cross-origin',
   'x-frame-options': 'DENY',
-  'content-security-policy': "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
+  'content-security-policy': "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'",
 };
 function send(res, status, body, type = 'application/json; charset=utf-8', extra = {}) {
   const buf = Buffer.isBuffer(body) ? body : Buffer.from(typeof body === 'string' ? body : JSON.stringify(body));
@@ -134,7 +134,7 @@ const server = http.createServer(async (req, res) => {
       const report = await runScan('upload', { buf, name }, clientIp(req));
       return send(res, 200, report);
     }
-    if (req.method === 'GET' && /^\/[\w.-]+\.(js|css|svg|png|ico|txt)$/.test(p)) return serveStatic(res, p.slice(1));
+    if (req.method === 'GET' && /^\/(vendor\/)?[\w.-]+\.(js|css|svg|png|ico|txt)$/.test(p)) return serveStatic(res, p.slice(1));
     send(res, 404, 'Not found', 'text/plain');
   } catch (e) { errorOut(res, e); }
 });
