@@ -74,22 +74,27 @@ const haze = [0, 1].map((i) => ({
 // the jelly turns. The four rings ride round with it. Tentacles trail behind every move.
 // Everything is kept soft and slow on purpose: subtle, not showy.
 // Sunlit instead of electric blue: gold bells with pale cream edges.
-const JB = '255,170,30', JL = '255,210,120', JW = '255,232,180', WH = '255,250,236';
+// Sunlit gold by default. A scan verdict tints them (deep red for red flags, sea green for no known
+// red flags), set from the mood code further down.
+const J_BASE = { JB: [255, 170, 30], JL: [255, 210, 120], JW: [255, 232, 180], WH: [255, 250, 236] };
+let JB = '255,170,30', JL = '255,210,120', JW = '255,232,180', WH = '255,250,236';
 const TAU = Math.PI * 2;
 
-// A soft halo, painted once.
-const halo = (() => {
-  const S = 256, c = document.createElement('canvas');
+// A soft halo, repainted only when the jellies' colour changes.
+const halo = document.createElement('canvas');
+function paintHalo() {
+  const S = 256, c = halo;
   c.width = c.height = S;
   const g = c.getContext('2d');
+  g.clearRect(0, 0, S, S);
   const rg = g.createRadialGradient(S / 2, S / 2, 0, S / 2, S / 2, S / 2);
   rg.addColorStop(0, `rgba(${JB},0.5)`);
   rg.addColorStop(0.45, `rgba(${JB},0.2)`);
   rg.addColorStop(1, `rgba(${JB},0)`);
   g.fillStyle = rg;
   g.fillRect(0, 0, S, S);
-  return c;
-})();
+}
+paintHalo();
 
 const JELLY_COUNT = W < 600 ? 3 : 5;
 const DEPTHS = [0.95, 0.7, 0.48, 0.28, 0.12];
@@ -445,13 +450,17 @@ function drawJelly(j, t, dt) {
 // The light is the scanner: while a scan runs the shafts brighten and sweep through the water like
 // a searchlight; when the verdict lands they settle into its colour (rose for red flags, amber for
 // worth checking, calm gold for no known red flags). window.__sunMood(state) sets it.
+// tint = the colour the jellies and the water's haze lean towards, mix = how far.
 const MOODS = {
-  idle:  { c: [255, 214, 110], k: 1.0, sweep: 0 },
-  scan:  { c: [255, 226, 150], k: 1.9, sweep: 1 },
-  red:   { c: [255, 118, 132], k: 1.35, sweep: 0 },
-  amber: { c: [255, 160, 78],  k: 1.2, sweep: 0 },
-  clear: { c: [255, 214, 110], k: 1.15, sweep: 0 },
+  idle:  { c: [255, 214, 110], k: 1.0,  sweep: 0, tint: null,           mix: 0 },
+  scan:  { c: [255, 226, 150], k: 1.9,  sweep: 1, tint: null,           mix: 0 },
+  red:   { c: [235, 40, 55],   k: 1.75, sweep: 0, tint: [225, 35, 50],  mix: 0.85 },
+  amber: { c: [255, 140, 50],  k: 1.3,  sweep: 0, tint: [255, 130, 40], mix: 0.55 },
+  clear: { c: [90, 225, 150],  k: 1.3,  sweep: 0, tint: [70, 215, 140], mix: 0.7 },
 };
+let tintC = [255, 170, 30], tintK = 0, lastTint = '';
+const HAZE_BASE = { a: [240, 185, 11], b: [255, 140, 30] };
+const mixC = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
 let mood = MOODS.idle, sunC = MOODS.idle.c.slice(), sunK = 1, sweepK = 0, sweepT = 0;
 window.__sunMood = (m) => { mood = MOODS[m] || MOODS.idle; };
 let SUN = sunC.map(Math.round).join(',');
@@ -468,6 +477,21 @@ function drawRays(t) {
   sweepK += (mood.sweep - sweepK) * 0.03;
   sweepT += 0.016 * (0.4 + sweepK);
   SUN = sunC.map(Math.round).join(',');
+  // jellies and the water's haze lean towards the verdict's colour
+  if (mood.tint) for (let i = 0; i < 3; i++) tintC[i] += (mood.tint[i] - tintC[i]) * 0.03;
+  tintK += (mood.mix - tintK) * 0.025;
+  const key = tintC.map(Math.round).join(',') + '|' + tintK.toFixed(2);
+  if (key !== lastTint) {
+    lastTint = key;
+    JB = mixC(J_BASE.JB, tintC, tintK).join(',');
+    JL = mixC(J_BASE.JL, tintC, tintK * 0.85).join(',');
+    JW = mixC(J_BASE.JW, tintC, tintK * 0.6).join(',');
+    WH = mixC(J_BASE.WH, tintC, tintK * 0.35).join(',');
+    paintHalo();
+    const root = document.documentElement.style;
+    root.setProperty('--tank-a', mixC(HAZE_BASE.a, tintC, tintK * 0.8).join(','));
+    root.setProperty('--tank-b', mixC(HAZE_BASE.b, tintC, tintK * 0.8).join(','));
+  }
   void e;
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';

@@ -143,6 +143,12 @@
     src.append(' · ' + r.coverage.files + ' files, ' + r.coverage.deps + ' dependencies');
     if (r.coverage.registryChecked) src.append(', ' + r.coverage.registryChecked + ' looked up on npm');
 
+    // start folded: verdict and counts only, details one click away
+    var total = r.findings.length;
+    setDetails(false);
+    $('toggleDetails').hidden = !total && !(r.summary || []).length;
+    $('toggleDetails').dataset.n = total;
+    $('toggleLbl').textContent = total ? 'Show the details (' + total + ')' : 'Show the details';
     var box = $('findings'); box.textContent = '';
     GROUPS.forEach(function (g) {
       var items = r.findings.filter(function (f) { return f.severity === g[0]; });
@@ -163,6 +169,18 @@
     });
     if (r.truncatedFindings) box.append(el('p', 'more', '+' + r.truncatedFindings + ' more findings not shown.'));
   }
+
+  function setDetails(open) {
+    $('details').hidden = !open;
+    $('toggleDetails').setAttribute('aria-expanded', open ? 'true' : 'false');
+    var n = +$('toggleDetails').dataset.n || 0;
+    $('toggleLbl').textContent = open ? 'Hide the details' : (n ? 'Show the details (' + n + ')' : 'Show the details');
+  }
+  $('toggleDetails').addEventListener('click', function () {
+    var open = $('details').hidden;
+    setDetails(open);
+    if (open && window.__lenis) window.__lenis.resize && window.__lenis.resize();
+  });
 
   $('copy').addEventListener('click', function () {
     if (!current) return;

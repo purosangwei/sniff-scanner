@@ -57,7 +57,6 @@
       <section id="result" hidden aria-live="polite">
         <div class="verdict" id="verdict"><span class="dot" aria-hidden="true"></span><h2 id="headline"></h2></div>
         <p class="note" id="note"></p>
-        <ul class="summary" id="summary"></ul>
         <div class="gf-outs">
           <div class="gf-cell out gf-out"><span class="gf-lbl">Red flags</span><span class="v" id="oHigh">0</span></div>
           <div class="gf-cell out gf-out"><span class="gf-lbl">Worth checking</span><span class="v" id="oMed">0</span></div>
@@ -69,7 +68,11 @@
           <button class="lnk" id="copy" type="button">Copy link to this result</button>
           <button class="lnk" id="again" type="button">Scan another</button>
         </div>
-        <div id="findings"></div>
+        <button class="expand" id="toggleDetails" type="button" aria-expanded="false" aria-controls="details"><span id="toggleLbl">Show the details</span><i aria-hidden="true"></i></button>
+        <div id="details" hidden>
+          <ul class="summary" id="summary"></ul>
+          <div id="findings"></div>
+        </div>
       </section>
     </section>
 
