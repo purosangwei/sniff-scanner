@@ -219,7 +219,7 @@ button.lnk:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; b
 .checks li b{ color:var(--ink); font-weight:400; font-size:15px; line-height:1.35; }
 .checks li span{ color:var(--ink-dim); font-size:13.5px; line-height:1.5; }
 @container (min-width:620px){
-  .checks li{ grid-template-columns:minmax(0,15em) minmax(0,1fr); gap:24px; align-items:baseline; padding:14px 0; }
+  .checks li{ padding:14px 0; }
 }
 .how{ border-top:1px solid var(--edge); padding:34px 0 20px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:34px; }
 @media (max-width:760px){ .how{ grid-template-columns:1fr; gap:18px; } }
@@ -360,3 +360,25 @@ button.gf-btn:not(:disabled):focus-visible{ box-shadow:inset 0 1px 0 rgba(255,25
 .sample .sd.red{ background:var(--high); box-shadow:0 0 8px rgba(255,111,125,.7); }
 @media (max-width:640px){ .scanbox::before{ inset:-30px 0 -20px 0; } }
 .checks li span.wait{ opacity:0; }
+
+/* ---------- layout: the scanner centred on its own, the tricks underneath in two columns ---------- */
+.cols{ grid-template-columns:1fr; gap:64px; padding-top:44px; }
+.scanbox{ width:100%; max-width:780px; margin:0 auto; }
+.scanbox > .eyebrow, .scanbox > h2, .scanbox > .sub{ text-align:center; margin-left:auto; margin-right:auto; }
+.scanbox .actions, .scanbox .samples{ justify-content:center; }
+.scanbox .status{ text-align:center; }
+.scanbox::before{ inset:-50px -40px -30px -40px; background:radial-gradient(55% 60% at 50% 45%, rgba(var(--j-jl),.10), rgba(var(--j-jb),.04) 55%, transparent 80%); }
+@media (max-width:640px){ .scanbox::before{ inset:-30px 0 -20px 0; } }
+#how{ width:100%; max-width:1000px; margin:0 auto; padding-top:44px; border-top:1px solid var(--edge); }
+#how > .eyebrow, #how > h2, #how > .sub{ text-align:center; margin-left:auto; margin-right:auto; }
+#how > .sub{ max-width:560px; margin-bottom:26px; }
+.checks{ display:grid; grid-template-columns:1fr; column-gap:56px; }
+@media (min-width:760px){
+  .checks{ grid-template-columns:1fr 1fr; }
+  .checks li:nth-last-child(2){ border-bottom:1px solid var(--edge); }
+}
+.scanbox > h2, #how > h2{ display:block; width:100%; }
+.scanbox .gf-cell{ align-items:center; text-align:center; }
+.scanbox .gf-val.url{ text-align:center; }
+.checks li{ align-content:start; }
+@media (max-width:480px){ .scanbox .gf-val.url{ font-size:20px; } }
