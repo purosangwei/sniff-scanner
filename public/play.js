@@ -236,16 +236,22 @@ if (false) {
 // ------------------------------------------------------------------ the trade, typed out
 
 const trace = document.getElementById('trace');
+// three invisible columns: file, what it does, verdict. Padding is worked out on the
+// plain text so the tags don't throw the columns off.
+const COL = [14, 32];
+const strip = (t) => t.replace(/<[^>]+>/g, '');
+const row = (...cells) => '  ' + cells.map((c, i) => i < cells.length - 1 && COL[i] ? c + ' '.repeat(Math.max(1, COL[i] - strip(c).length)) : c).join('');
 const TRACE = [
   '<em>sniff</em> github.com/acme-hiring/<b>defi-dashboard-test</b>',
   '',
-  '  package.json  postinstall → <b>node config/setup.js</b>',
-  '  setup.js      eval(Buffer.from(…, base64))   <em>red flag</em>',
-  '  setup.js      talks to 203.0.113.7:1224        <em>red flag</em>',
-  '  .vscode       runs on folder open           <em>red flag</em>',
+  row('package.json', 'postinstall → <b>node setup.js</b>', '<em>red flag</em>'),
+  row('setup.js', 'eval(Buffer.from(…, base64))', '<em>red flag</em>'),
+  row('setup.js', 'talks to 203.0.113.7:1224', '<em>red flag</em>'),
+  row('.vscode', 'runs on folder open', '<em>red flag</em>'),
   '',
-  '  files run     <s>none ✓</s>',
-  '  verdict       <b>don\'t run this</b>',].join('\n');
+  row('files run', '<s>none ✓</s>'),
+  row('verdict', '<b>don\'t run this</b>'),
+].join('\n');
 let typed = false;
 function typeTrace() {
   if (!trace || typed) return;
