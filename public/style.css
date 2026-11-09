@@ -382,3 +382,11 @@ button.gf-btn:not(:disabled):focus-visible{ box-shadow:inset 0 1px 0 rgba(255,25
 .scanbox .gf-val.url{ text-align:center; }
 .checks li{ align-content:start; }
 @media (max-width:480px){ .scanbox .gf-val.url{ font-size:20px; } }
+
+/* "Scan a repo" styled like $SNIFF on the banner: light Lexend, jellyfish gradient per letter, golden glow */
+.scanbox > h2{ font-weight:300; font-size:clamp(52px,8vw,112px); line-height:1.08; letter-spacing:-.02em; margin:6px 0 14px; padding-bottom:4px;
+  color:rgb(var(--j-jl)); text-shadow:none;
+  filter:drop-shadow(0 0 2px rgba(var(--j-wh),.7)) drop-shadow(0 0 22px rgba(var(--j-jb),.5)) drop-shadow(0 0 60px rgba(var(--j-jb),.3)); }
+.scanbox > h2 .ch{ color:transparent; -webkit-background-clip:text; background-clip:text; text-shadow:none;
+  background-image:linear-gradient(180deg, rgb(var(--j-wh)) 8%, rgb(var(--j-jw)) 34%, rgb(var(--j-jl)) 62%, rgb(var(--j-jb)) 96%); }
+.scanbox > h2[data-rise].in{ clip-path:inset(-40% -10% -40% -10%); }
