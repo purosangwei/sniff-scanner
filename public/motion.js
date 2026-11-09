@@ -513,7 +513,7 @@ function drawRays(t) {
   ctx.save();
   ctx.globalCompositeOperation = 'lighter';
   // glare where the sun hits the surface
-  const gx = W * (0.32 + sweepK * 0.3 * Math.sin(sweepT * 0.9)), glare = ctx.createRadialGradient(gx, -H * 0.05, 0, gx, -H * 0.05, Math.max(W, H) * 0.75);
+  const gx = W * (0.32 + sweepK * (W < 700 ? 0.45 : 0.3) * Math.sin(sweepT * 0.9)), glare = ctx.createRadialGradient(gx, -H * 0.05, 0, gx, -H * 0.05, Math.max(W, H) * 0.75);
   glare.addColorStop(0, `rgba(${SUN},${0.22 * sunK})`);
   glare.addColorStop(0.35, `rgba(${SUN},${0.07 * sunK})`);
   glare.addColorStop(1, `rgba(${SUN},0)`);
@@ -521,10 +521,13 @@ function drawRays(t) {
   ctx.fillRect(0, 0, W, H);
   for (const r of rays) {
     const breathe = 0.55 + 0.45 * Math.sin((t / r.sp) * 6.283 + r.ph);
-    const x0 = (r.x + Math.sin((t / (r.sp * 1.7)) * 6.283 + r.ph) * r.sw + sweepK * 0.14 * Math.sin(sweepT * 1.3 + r.ph)) * W;
-    const w0 = r.w * W, w1 = w0 * r.spread, len = H * 1.05, dx = len * r.slant;
+    // On a phone the screen is narrow, so widths and the scanning sweep measured in screen widths
+    // came out thin and barely moving. Size the beams for a wider screen and swing them further.
+    const narrow = W < 700, RW = Math.max(W, 820), swing = narrow ? 0.34 : 0.14, boost = narrow ? 1.35 : 1;
+    const x0 = (r.x + Math.sin((t / (r.sp * 1.7)) * 6.283 + r.ph) * r.sw * (narrow ? 2 : 1) + sweepK * swing * Math.sin(sweepT * (narrow ? 1.6 : 1.3) + r.ph)) * W;
+    const w0 = r.w * RW * (narrow ? 0.8 : 1), w1 = w0 * r.spread, len = H * 1.05, dx = len * r.slant;
     const g = ctx.createLinearGradient(0, 0, 0, len);
-    const lift = sunK * (1 + sweepK * 0.6 * Math.max(0, Math.sin(sweepT * 2.1 + r.ph * 3)));
+    const lift = boost * sunK * (1 + sweepK * (narrow ? 0.9 : 0.6) * Math.max(0, Math.sin(sweepT * 2.1 + r.ph * 3)));
     g.addColorStop(0, `rgba(${SUN},${Math.min(0.5, r.a * breathe * lift)})`);
     g.addColorStop(0.5, `rgba(${SUN},${Math.min(0.25, r.a * breathe * 0.35 * lift)})`);
     g.addColorStop(1, `rgba(${SUN},0)`);
