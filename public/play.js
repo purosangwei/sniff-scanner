@@ -25,7 +25,7 @@ const anim = (el, frames, opts) => {
   try { seen = sessionStorage.getItem('sniff.intro') === '1'; sessionStorage.setItem('sniff.intro', '1'); } catch {}
   if (seen) return;
   const lines = [
-    '<b>sniff</b> · coding test scanner',
+    '<b>sniff</b> · repo scanner',
     'diving in ..................... <s>ok</s>',
     'loading red flags ............. <s>ok</s>',
     'reading files ................. <s>ok</s>',

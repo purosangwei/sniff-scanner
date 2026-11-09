@@ -3,10 +3,10 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>$SNIFF Coding Test Scanner</title>
-<meta name="description" content="Got a coding test from a recruiter? Scan it before you run it. Free, takes seconds, never runs the code.">
+<title>$SNIFF Repo Scanner</title>
+<meta name="description" content="Scan any GitHub repo or zip for malware before you run it. Free, takes seconds, never runs the code.">
 <meta property="og:title" content="A fake coding test cost Binance $6.3 billion. Scan yours before you run it.">
-<meta property="og:description" content="Flags the tricks used in fake-recruiter attacks, including the one behind the Binance hack. Free and it never runs the code.">
+<meta property="og:description" content="Paste a GitHub link or drop a zip. $SNIFF flags the tricks malicious repos use to run code on your machine. Free, and it never runs the code.">
 <meta name="theme-color" content="#140d03">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -24,7 +24,7 @@
   </header>
 
   <section class="hero">
-    <div class="eyebrow" data-scr>Fake-recruiter malware check · free</div>
+    <div class="eyebrow" data-scr>Repo malware check · free</div>
     <h1 aria-label="A fake coding test cost Binance $6.3 billion. Scan yours before you run it."><span aria-hidden="true"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">fake</span> <span class="w" style="--i:2">coding</span> <span class="w" style="--i:3">test</span> <span class="w" style="--i:4">cost</span> <span class="w" style="--i:5">Binance</span> <span class="w" style="--i:6">$6.3</span> <span class="w" style="--i:7">billion.</span><br><span class="dim"><span class="w" style="--i:8">Scan</span> <span class="w" style="--i:9">yours</span> <span class="w" style="--i:10">before</span> <span class="w" style="--i:11">you</span> <span class="w" style="--i:12">run</span> <span class="w" style="--i:13">it.</span></span></span></h1>
     <p data-float="900">A few other scanners exist, but they're built for security experts. $SNIFF is the first anyone can use without knowing what to look for. Paste a link, get a plain-English answer, nothing to install.</p>
     <p class="hero-small" data-float="1000">Free. About 30 seconds. We read the files and never run them.</p>
@@ -39,12 +39,12 @@
     <section aria-labelledby="scanH" data-float="0">
       <div class="eyebrow" data-scr>Reads the files, never runs them</div>
       <h2 id="scanH" data-rise>Scan a test</h2>
-      <p class="sub">Paste the link the recruiter sent, or drop the zip.</p>
+      <p class="sub">Paste a GitHub link, or drop a zip. Coding tests, starter kits, tools from a stranger, anything you're about to run.</p>
 
       <form id="scanForm" class="gf-grid" autocomplete="off" novalidate>
         <label class="gf-cell c6">
           <span class="gf-lbl">GitHub link</span>
-          <input class="gf-val url" id="repo" type="text" inputmode="url" spellcheck="false" placeholder="github.com/company/take-home-test" aria-describedby="repoHint">
+          <input class="gf-val url" id="repo" type="text" inputmode="url" spellcheck="false" placeholder="github.com/someone/their-repo" aria-describedby="repoHint">
           <span class="gf-hint" id="repoHint" aria-live="polite">Public repos only. For anything else, use the zip.</span>
         </label>
       </form>
@@ -83,7 +83,7 @@
       <h2 data-rise>The tricks</h2>
       <p class="sub">The ways any repo you download can run code on your machine, from fake coding tests to dodgy packages.</p>
       <ul class="checks">
-        <li><b>Code that runs on npm install.</b> The Binance attack worked like this: the test ran its payload during setup.</li>
+        <li><b>Code that runs on npm install.</b> The most common trick. The payload goes off while you're just setting up.</li>
         <li><b>VS Code tasks that run when you open the folder.</b> No install needed, just opening it is enough.</li>
         <li><b>Hidden and scrambled code.</b> Obfuscators, long encoded blobs, eval, code pushed off the edge of the screen.</li>
         <li><b>Calls home.</b> Bare IP addresses, paste sites, Discord and Telegram webhooks.</li>
@@ -97,8 +97,8 @@
 
   <section class="how" aria-label="Staying safe">
     <div data-float="0"><h3><span>1</span>Scan first</h3><p>Before you install anything or open the folder in VS Code. Both can run code on their own.</p></div>
-    <div data-float="140"><h3><span>2</span>Use a throwaway machine</h3><p>Open it in a VM or cloud dev box, even if the scan comes back clean. Never on the laptop with your wallets, and never on a work laptop. That's how Binance lost $6.3 billion.</p></div>
-    <div data-float="280"><h3><span>3</span>Check the company</h3><p>A real website that links to the same GitHub account. Recruiters who rush you to run the test are a warning sign in themselves.</p></div>
+    <div data-float="140"><h3><span>2</span>Use a throwaway machine</h3><p>Open it in a VM or cloud dev box, even if the scan comes back clean. Never on the laptop with your wallets, and never on a work laptop.</p></div>
+    <div data-float="280"><h3><span>3</span>Check where it came from</h3><p>Who made it, and do they have a real history? A brand-new account or one-commit repo is a bad sign. So is anyone rushing you to run it.</p></div>
   </section>
 
   <section class="receipt" aria-label="What one scan looks like">
@@ -109,7 +109,7 @@
     </div>
     <div class="pane" data-float="160">
       <div class="pane-top"><i></i><i></i><i></i><span>sniff · scan</span></div>
-      <pre id="trace" aria-label="A scan of a fake coding test: an install hook runs config/setup.js, which decodes hidden code and talks to a bare IP address, and a VS Code task runs on folder open. Verdict: don't run this."></pre>
+      <pre id="trace" aria-label="A scan of a malicious repo: an install hook runs config/setup.js, which decodes hidden code and talks to a bare IP address, and a VS Code task runs on folder open. Verdict: don't run this."></pre>
     </div>
   </section>
 

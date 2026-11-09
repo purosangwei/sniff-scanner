@@ -92,7 +92,7 @@
   }
   function scanFile(f) {
     if (!f) return;
-    if (f.size > 25 * 1024 * 1024) { status('That file is over 25 MB. Coding tests are usually much smaller.', 'err'); return; }
+    if (f.size > 25 * 1024 * 1024) { status('That file is over 25 MB. Most repos are much smaller.', 'err'); return; }
     if (!/\.(zip|tgz|tar\.gz|gz)$/i.test(f.name)) { status('Drop a .zip of the project.', 'err'); return; }
     busy(true); mood('scan'); status('Reading ' + f.name + '…', 'busy');
     post('/api/upload', f, { 'content-type': 'application/octet-stream', 'x-filename': encodeURIComponent(f.name) })
