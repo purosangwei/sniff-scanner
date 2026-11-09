@@ -503,8 +503,10 @@ function drawRays(t) {
       root.setProperty('--accent-soft', `rgb(${mixC(INK_BASE.soft, tintC, tintK * 0.75).join(',')})`);
       root.setProperty('--ghost', `0 0 1px rgba(255,244,222,.5), 0 0 14px rgba(${halo},.32), 0 0 38px rgba(${halo},.24)`);
       root.setProperty('--ghost-soft', `0 0 10px rgba(${halo},.15), 0 0 28px rgba(${halo},.08)`);
+      // the jelly-coloured headline line follows the jellies
+      root.setProperty('--j-wh', WH); root.setProperty('--j-jw', JW); root.setProperty('--j-jl', JL); root.setProperty('--j-jb', JB);
     } else {
-      for (const v of ['--ink', '--ink-rgb', '--ink-dim', '--ink-faint', '--accent-soft', '--ghost', '--ghost-soft']) root.removeProperty(v);
+      for (const v of ['--ink', '--ink-rgb', '--ink-dim', '--ink-faint', '--accent-soft', '--ghost', '--ghost-soft', '--j-wh', '--j-jw', '--j-jl', '--j-jb']) root.removeProperty(v);
     }
   }
   void e;

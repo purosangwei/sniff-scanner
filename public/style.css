@@ -10,6 +10,8 @@
   --accent:#f0b90b; --accent-rgb:240,185,11; --accent-ink:#1a1300; --accent-soft:#f8d33a;
   --good:#9fd4a8; --high:#ff6f7d; --high-rgb:255,111,125; --med:#ff9d5c; --med-rgb:255,157,92;
   /* the water: dark amber with sunlit gold, used by motion.js */
+  /* the jellyfish colours (motion.js J_BASE), for the headline's second line */
+  --j-wh:255,250,236; --j-jw:255,232,180; --j-jl:255,210,120; --j-jb:255,170,30;
   --tank-a:240,185,11; --tank-b:255,140,30; --mote:255,236,190;
   --gf-font:'Lexend',ui-sans-serif,system-ui,sans-serif;
   --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
@@ -21,7 +23,12 @@ html{ background:var(--bg); -webkit-text-size-adjust:100%; }
 body{ margin:0; background:transparent; color:var(--ink); font:300 15px/1.55 var(--gf-font); -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
   text-rendering:optimizeLegibility; overflow-x:hidden; }
 h1, h2, h3, .brand, .gf-val, .gf-out .v{ text-shadow:var(--ghost); }
-.hero h1 .dim{ text-shadow:0 0 18px rgba(255,200,120,.2), 0 0 46px rgba(255,170,40,.18); }
+/* second line is lit like a jellyfish: pale glow at the top of each letter, warm amber at the bottom */
+.hero h1 .dim{ display:inline-block; filter:drop-shadow(0 0 14px rgba(var(--j-jb),.28)) drop-shadow(0 0 40px rgba(var(--j-jb),.14)); }
+/* painted per letter: the letters are split into their own boxes by play.js, and a gradient
+   clipped across them breaks; each letter gets the same top-to-bottom light instead */
+.hero h1 .dim .ch{ color:transparent; -webkit-background-clip:text; background-clip:text; text-shadow:none;
+  background-image:linear-gradient(180deg, rgb(var(--j-wh)) 12%, rgb(var(--j-jw)) 38%, rgb(var(--j-jl)) 64%, rgba(var(--j-jb),.92) 96%); }
 /* warm light pooled in the water, behind the moving tank */
 body::before{ content:""; position:fixed; inset:-20vmax; z-index:-2; pointer-events:none;
   background:
@@ -114,7 +121,7 @@ button.gf-btn:not(:disabled){ background:radial-gradient(90px circle at var(--bx
 .toplink{ font-size:14px; color:var(--ink-dim); }
 .hero{ padding:56px 0 34px; max-width:820px; }
 .hero h1{ font:200 clamp(36px,5.6vw,64px)/1.04 var(--gf-font); letter-spacing:-.035em; margin:0 0 18px; }
-.hero h1 .dim{ color:var(--ink-dim); }
+.hero h1 .dim{ color:rgb(var(--j-jl)); }
 .hero p{ color:var(--ink-dim); font-size:17px; max-width:600px; margin:0; }
 
 .cols{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,420px); gap:56px; padding:26px 0 40px; border-top:1px solid var(--edge); }
