@@ -303,3 +303,5 @@ button.tile:focus-visible{ outline:none; border-color:rgba(var(--accent-rgb),.75
   background-image:linear-gradient(180deg, rgb(var(--j-wh)) 8%, rgb(var(--j-jw)) 34%, rgb(var(--j-jl)) 62%, rgb(var(--j-jb)) 96%); }
 .eyebrow{ opacity:1; filter:drop-shadow(0 0 8px rgba(var(--j-jb),.35)); }
 .how h3 > span:first-child{ color:rgb(var(--j-jl)); filter:drop-shadow(0 0 8px rgba(var(--j-jb),.35)); }
+
+.hero p.hero-small{ margin-top:12px; font-size:14px; color:var(--ink-faint); }
