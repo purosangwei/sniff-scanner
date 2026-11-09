@@ -144,15 +144,19 @@
     setOut($('oLow'), r.counts.low + r.counts.info, (r.counts.low + r.counts.info) ? '' : 'zero');
     setOut($('oFiles'), r.coverage.scanned || r.coverage.files, '');
 
+    // what was scanned, as a few labelled facts instead of one long line
     var src = $('src'); src.textContent = '';
+    function fact(label, value) { var d = el('div', 'fact'); d.append(el('dt', null, label)); var dd = el('dd'); dd.append(value); d.append(dd); src.append(d); }
     if (r.source.type === 'github') {
       var a = el('a', null, r.source.label); a.href = r.source.url; a.rel = 'noopener nofollow'; a.target = '_blank';
-      src.append(a, (r.source.ref ? ' · ' + r.source.ref : '') + (r.source.sha ? ' @ ' + r.source.sha.slice(0, 7) : ''));
-    } else src.append(r.source.label);
+      fact('Repo', a);
+      if (r.source.ref || r.source.sha) fact('Version', (r.source.ref || '') + (r.source.sha ? (r.source.ref ? ' · ' : '') + r.source.sha.slice(0, 7) : ''));
+    } else fact('File', r.source.label);
     var when = new Date(r.scannedAt);
-    src.append(' · scanned ' + when.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }));
-    src.append(' · ' + r.coverage.files + ' files, ' + r.coverage.deps + ' dependencies');
-    if (r.coverage.registryChecked) src.append(', ' + r.coverage.registryChecked + ' looked up on npm');
+    fact('Scanned', when.toLocaleString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' }));
+    var cov = r.coverage.files + ' files · ' + r.coverage.deps + (r.coverage.deps === 1 ? ' dependency' : ' dependencies');
+    if (r.coverage.registryChecked) cov += ' · ' + r.coverage.registryChecked + ' checked on npm';
+    fact('Checked', cov);
 
     closeTile();
     // start folded: verdict and counts only, details one click away
