@@ -208,9 +208,15 @@ button.lnk:focus-visible{ outline:1px solid var(--accent); outline-offset:4px; b
 
 /* ---------- side list, how, footer ---------- */
 .checks{ list-style:none; padding:0; margin:0; }
-.checks li{ padding:11px 0; border-top:1px solid var(--edge); color:var(--ink-dim); font-size:14px; }
+.checks{ container-type:inline-size; }
+/* name on its own line, the detail under it in quieter text; side by side when there's room */
+.checks li{ display:grid; grid-template-columns:1fr; gap:3px; padding:12px 0; border-top:1px solid var(--edge); }
 .checks li:last-child{ border-bottom:1px solid var(--edge); }
-.checks li b{ color:var(--ink); font-weight:400; }
+.checks li b{ color:var(--ink); font-weight:400; font-size:15px; line-height:1.35; }
+.checks li span{ color:var(--ink-dim); font-size:13.5px; line-height:1.5; }
+@container (min-width:620px){
+  .checks li{ grid-template-columns:minmax(0,15em) minmax(0,1fr); gap:24px; align-items:baseline; padding:14px 0; }
+}
 .how{ border-top:1px solid var(--edge); padding:34px 0 20px; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:34px; }
 @media (max-width:760px){ .how{ grid-template-columns:1fr; gap:18px; } }
 .how h3{ font:300 16px var(--gf-font); margin:0 0 6px; }

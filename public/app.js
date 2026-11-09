@@ -130,7 +130,12 @@
     $('result').hidden = false;
     $('verdict').className = 'verdict ' + r.verdict;
     $('headline').textContent = r.headline;
-    $('note').textContent = r.note;
+    var NOTES = {
+      clear: "That's a good sign, not a guarantee. If you don't know who made it, open it in a VM anyway.",
+      amber: "None of these are proof of malware on their own. Read the flagged files, and if you're unsure, only open it in a VM.",
+      red: "Stop here. Don't install it, open it in VS Code or run it on a machine with wallets or work logins."
+    };
+    $('note').textContent = NOTES[r.verdict] || r.note;
     var ul = $('summary'); ul.textContent = '';
     (r.summary || []).forEach(function (s) { ul.append(el('li', null, s)); });
 
