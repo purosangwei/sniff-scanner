@@ -22,12 +22,12 @@ function format(r, publicUrl) {
 }
 
 const HELP = [
-  'Send me a recruiter coding test before you run it.',
+  'Send me a GitHub link or a zip before you run it.',
   '',
   '/scan github.com/owner/repo',
   'or just send the .zip file.',
   '',
-  "I read the files and never run them. I flag known tricks used in fake-recruiter attacks. No known red flags is a good sign, not a guarantee, so use a VM if you don't know the company.",
+  "I read the files and never run them. I flag known tricks malicious repos use. No known red flags is a good sign, not a guarantee, so use a VM if you don't know who made it.",
 ].join('\n');
 
 function start({ runScan, publicUrl }) {
