@@ -96,6 +96,8 @@ button.gf-btn:not(:disabled){ background:radial-gradient(90px circle at var(--bx
 .pane-top i:first-child{ background:var(--accent); box-shadow:0 0 10px rgba(var(--accent-rgb),.8); }
 .pane-top span{ margin-left:10px; }
 #trace{ margin:0; padding:18px 20px 22px; min-height:212px; font:300 13px/1.75 var(--mono); color:var(--ink-dim); white-space:pre; overflow-x:auto; }
+#trace i{ font-style:normal; color:var(--ink-faint); }
+#trace u{ text-decoration:none; color:rgb(var(--j-jw)); }
 #trace b{ font-weight:400; color:var(--ink); text-shadow:var(--ghost); } #trace em{ font-style:normal; color:var(--high); } #trace s{ text-decoration:none; color:var(--good); }
 .caret{ display:inline-block; width:7px; height:1.05em; vertical-align:-2px; margin-left:2px; background:var(--accent); box-shadow:0 0 10px rgba(var(--accent-rgb),.9); animation:blink 1.2s steps(1) infinite; }
 @keyframes blink{ 50%{ opacity:0; } }

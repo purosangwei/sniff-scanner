@@ -240,7 +240,12 @@ const trace = document.getElementById('trace');
 // plain text so the tags don't throw the columns off.
 const COL = [14, 32];
 const strip = (t) => t.replace(/<[^>]+>/g, '');
-const row = (...cells) => '  ' + cells.map((c, i) => i < cells.length - 1 && COL[i] ? c + ' '.repeat(Math.max(1, COL[i] - strip(c).length)) : c).join('');
+// file names sit back (<i>), what each one does is lit in jelly cream (<u>), the verdict keeps its own colour
+const WRAP = ['i', 'u'];
+const row = (...cells) => '  ' + cells.map((c, i) => {
+  const w = WRAP[i] ? `<${WRAP[i]}>${c}</${WRAP[i]}>` : c;
+  return i < cells.length - 1 && COL[i] ? w + ' '.repeat(Math.max(1, COL[i] - strip(c).length)) : w;
+}).join('');
 const TRACE = [
   '<em>sniff</em> github.com/acme-hiring/<b>defi-dashboard-test</b>',
   '',
