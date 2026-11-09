@@ -107,6 +107,39 @@
   function fail(e) { busy(false); mood('idle'); status(e.message || 'Scan failed.', 'err'); }
 
   $('scanForm').addEventListener('submit', function (e) { e.preventDefault(); scanLink(); });
+  // "The tricks" list types itself out, one trick at a time, the first time it scrolls into view
+  (function () {
+    var list = document.querySelector('.checks'); if (!list || reduced || !('IntersectionObserver' in window)) return;
+    var items = [].slice.call(list.querySelectorAll('li')).map(function (li) {
+      var b = li.querySelector('b'), sp = li.querySelector('span');
+      var t = b.textContent; li.setAttribute('aria-label', t + '. ' + (sp ? sp.textContent : ''));
+      b.textContent = '\u00a0'; if (sp) sp.classList.add('wait');
+      return { b: b, sp: sp, t: t };
+    });
+    var io = new IntersectionObserver(function (es) {
+      if (!es.some(function (e) { return e.isIntersecting; })) return;
+      io.disconnect();
+      (async function () {
+        for (var k = 0; k < items.length; k++) {
+          var it = items[k]; it.b.textContent = ''; it.b.classList.add('typing');
+          for (var i = 1; i <= it.t.length; i++) { it.b.textContent = it.t.slice(0, i); await new Promise(function (ok) { setTimeout(ok, 22); }); }
+          it.b.classList.remove('typing');
+          if (it.sp) { it.sp.classList.remove('wait'); it.sp.classList.add('fade'); }
+          await new Promise(function (ok) { setTimeout(ok, 120); });
+        }
+      })();
+    }, { threshold: 0.25 });
+    io.observe(list);
+  })();
+
+  // sample repos: fill the box and scan straight away
+  document.querySelectorAll('.sample').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var input = $('repo'); input.value = b.dataset.repo;
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+      scanLink();
+    });
+  });
   $('pick').addEventListener('click', function () { $('file').click(); });
   $('file').addEventListener('change', function () { scanFile(this.files[0]); this.value = ''; });
 

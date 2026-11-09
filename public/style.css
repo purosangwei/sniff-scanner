@@ -340,3 +340,23 @@ button.gf-btn:not(:disabled):focus-visible{ box-shadow:inset 0 1px 0 rgba(255,25
 @keyframes bell-glow{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.09) saturate(1.08); } }
 @media (prefers-reduced-motion:reduce){ button.gf-btn:not(:disabled){ animation:none; } }
 .src + .res-actions{ margin-top:20px; }
+
+/* ---------- the scanner is the point: give it more presence ---------- */
+.scanbox{ position:relative; }
+.scanbox::before{ content:""; position:absolute; inset:-40px -24px -30px -24px; z-index:-1; pointer-events:none; border-radius:40px;
+  background:radial-gradient(60% 55% at 30% 45%, rgba(var(--j-jl),.10), rgba(var(--j-jb),.04) 55%, transparent 80%); }
+.scanbox h2{ font-size:clamp(28px,3.2vw,36px); font-weight:250; letter-spacing:-.02em; margin-bottom:6px; }
+.scanbox .sub{ font-size:15px; color:var(--ink-dim); margin-bottom:20px; max-width:520px; }
+.scanbox .gf-val.url{ font-size:clamp(26px,3vw,34px); }
+.scanbox .gf-cell{ padding-top:20px; padding-bottom:20px; }
+.scanbox .actions{ margin-top:18px; }
+.scanbox .gf-btn{ font-size:16.5px; padding:16px 34px; }
+.samples{ display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 20px; margin-top:22px; font-size:14px; }
+.samples-lbl{ color:var(--ink-faint); }
+.sample{ display:inline-flex; align-items:center; gap:8px; }
+.sample .sd{ width:7px; height:7px; border-radius:50%; flex:none; }
+.sample .sd.clear{ background:#7fd6a4; box-shadow:0 0 8px rgba(127,214,164,.7); }
+.sample .sd.amber{ background:var(--med); box-shadow:0 0 8px rgba(255,157,92,.7); }
+.sample .sd.red{ background:var(--high); box-shadow:0 0 8px rgba(255,111,125,.7); }
+@media (max-width:640px){ .scanbox::before{ inset:-30px 0 -20px 0; } }
+.checks li span.wait{ opacity:0; }

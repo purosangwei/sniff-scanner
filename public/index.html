@@ -36,9 +36,9 @@
   </div></div>
 
   <div class="cols">
-    <section aria-labelledby="scanH" data-float="0">
+    <section class="scanbox" aria-labelledby="scanH" data-float="0">
       <div class="eyebrow" data-scr>Reads the files, never runs them</div>
-      <h2 id="scanH" data-rise>Scan a test</h2>
+      <h2 id="scanH" data-rise>Scan a repo</h2>
       <p class="sub">Paste a GitHub link, or drop a zip. Coding tests, starter kits, tools from a stranger, anything you're about to run.</p>
 
       <form id="scanForm" class="gf-grid" autocomplete="off" novalidate>
@@ -52,6 +52,12 @@
         <button class="gf-btn" id="go" type="submit" form="scanForm">Scan it</button>
         <button class="lnk" id="pick" type="button">or drop the zip here</button>
         <input id="file" type="file" accept=".zip,.tgz,.gz,application/zip" hidden>
+      </div>
+      <div class="samples">
+        <span class="samples-lbl">Or try one:</span>
+        <button type="button" class="lnk sample" data-repo="github.com/NomicFoundation/hardhat-boilerplate"><i class="sd clear"></i>A clean starter kit</button>
+        <button type="button" class="lnk sample" data-repo="github.com/sindresorhus/got"><i class="sd amber"></i>One worth checking</button>
+        <button type="button" class="lnk sample" data-repo="github.com/purosangwei/sniff-scanner"><i class="sd red"></i>One with red flags</button>
       </div>
       <p class="status" id="status" role="status" aria-live="polite"></p>
 
@@ -83,7 +89,7 @@
       <h2 data-rise>The tricks</h2>
       <p class="sub">The ways any repo you download can run code on your machine, from fake coding tests to dodgy packages.</p>
       <ul class="checks">
-        <li><b>Code that runs on npm install</b><span>The Binance attack worked like this: the test ran its payload during setup.</span></li>
+        <li><b>Code that runs on npm install</b><span>The Binance attack worked like this: the repo ran its payload during setup.</span></li>
         <li><b>VS Code tasks that run when you open the folder</b><span>No install needed, just opening it is enough.</span></li>
         <li><b>Hidden and scrambled code</b><span>Obfuscators, long encoded blobs, eval, code pushed off the edge of the screen.</span></li>
         <li><b>Calls home</b><span>Bare IP addresses, paste sites, Discord and Telegram webhooks.</span></li>
