@@ -305,3 +305,25 @@ button.tile:focus-visible{ outline:none; border-color:rgba(var(--accent-rgb),.75
 .how h3 > span:first-child{ color:rgb(var(--j-jl)); filter:drop-shadow(0 0 8px rgba(var(--j-jb),.35)); }
 
 .hero p.hero-small{ margin-top:12px; font-size:14px; color:var(--ink-faint); }
+
+/* ---------- Scan it: lit like a jellyfish bell ----------
+   Cream at the top fading to amber, a bright rim along the top edge, a soft halo
+   that breathes slowly, and the cursor highlight still riding on top. */
+button.gf-btn:not(:disabled){
+  color:#2a1600;
+  background:
+    radial-gradient(90px circle at var(--bx,50%) var(--by,50%), rgba(255,250,236,.55), transparent 70%),
+    radial-gradient(120% 90% at 50% 0%, rgba(var(--j-wh),.95) 0%, rgba(var(--j-jw),.9) 30%, rgba(var(--j-jl),.92) 58%, rgb(var(--j-jb)) 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255,252,240,.9),
+    inset 0 -6px 14px -6px rgba(180,95,0,.45),
+    0 0 0 1px rgba(var(--j-jl),.55),
+    0 0 18px -2px rgba(var(--j-jb),.55),
+    0 0 46px -6px rgba(var(--j-jb),.4);
+  animation:bell-glow 4.5s ease-in-out infinite;
+}
+button.gf-btn:not(:disabled):hover{ filter:brightness(1.06);
+  box-shadow:inset 0 1px 0 rgba(255,252,240,.95), inset 0 -6px 14px -6px rgba(180,95,0,.45), 0 0 0 1px rgba(var(--j-jl),.75), 0 0 24px 0 rgba(var(--j-jb),.7), 0 0 70px -4px rgba(var(--j-jb),.5); }
+button.gf-btn:not(:disabled):focus-visible{ box-shadow:inset 0 1px 0 rgba(255,252,240,.9), 0 0 0 3px rgba(var(--j-jl),.45), 0 0 30px 0 rgba(var(--j-jb),.6); }
+@keyframes bell-glow{ 0%,100%{ filter:brightness(1); } 50%{ filter:brightness(1.09) saturate(1.08); } }
+@media (prefers-reduced-motion:reduce){ button.gf-btn:not(:disabled){ animation:none; } }
