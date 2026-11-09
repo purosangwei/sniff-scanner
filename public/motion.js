@@ -462,7 +462,7 @@ let tintC = [255, 170, 30], tintK = 0, lastTint = '';
 const HAZE_BASE = { a: [240, 185, 11], b: [255, 140, 30] };
 // The page's text leans the same way, gently enough to stay easy to read: headings least,
 // grey text more, the small yellow labels most.
-const INK_BASE = { ink: [255, 234, 203], dim: [221, 194, 156], faint: [151, 123, 91], soft: [248, 211, 58], halo: [255, 170, 40] };
+const INK_BASE = { ink: [255, 249, 239], dim: [185, 171, 151], faint: [127, 115, 102], soft: [248, 211, 58], halo: [255, 170, 40] };
 const mixC = (a, b, k) => a.map((v, i) => Math.round(v + (b[i] - v) * k));
 let mood = MOODS.idle, sunC = MOODS.idle.c.slice(), sunK = 1, sweepK = 0, sweepT = 0;
 window.__sunMood = (m) => { mood = MOODS[m] || MOODS.idle; };
