@@ -132,23 +132,6 @@
     io.observe(list);
   })();
 
-  // ---------- first visit: an 8-second muted teaser, then the page. Once per visitor, always skippable.
-  (function () {
-    var box = $('intro'), v = $('introVid'), seen = false;
-    try { seen = localStorage.getItem('sniff-intro') === '1'; } catch (e) {}
-    if (seen || reduced || location.pathname !== '/') return;
-    function done() {
-      try { localStorage.setItem('sniff-intro', '1'); } catch (e) {}
-      box.classList.add('out'); setTimeout(function () { box.hidden = true; }, 700);
-    }
-    box.hidden = false;
-    $('introSkip').addEventListener('click', done);
-    v.addEventListener('ended', done);
-    v.addEventListener('error', done);
-    var p = v.play(); if (p && p.catch) p.catch(done);   // if the browser won't autoplay, just show the page
-    setTimeout(function () { if (!box.hidden && v.paused) done(); }, 2500);
-  })();
-
   // ---------- the full film, with sound, only when someone asks for it
   (function () {
     var film = $('film'), v = $('filmVid'), last = null;
