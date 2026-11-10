@@ -90,7 +90,11 @@ function start({ runScan, publicUrl }) {
           console.log(`[bot] update ${u.update_id} msg ${m.message_id}`);
           handle(m);
         }
-      } catch (e) { await sleep(5000); }
+      } catch (e) {
+        // Say why polling failed, at most once a minute, so a silent outage shows up in the logs.
+        if (!poll.last || Date.now() - poll.last > 60000) { poll.last = Date.now(); console.log(`[bot] poll error: ${e.name} ${e.message}`); }
+        await sleep(5000);
+      }
     }
   })();
   console.log('Telegram bot polling');
