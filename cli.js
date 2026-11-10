@@ -106,6 +106,9 @@ function print(r) {
   } else {
     throw new Error(`Can't find "${target}".`);
   }
-  if (json) console.log(JSON.stringify(report, null, 2)); else print(report);
-  process.exit({ clear: 0, amber: 1, red: 2 }[report.verdict]);
+  if (!json) print(report);
+  const code = { clear: 0, amber: 1, red: 2 }[report.verdict];
+  // write the JSON and only exit once it has been flushed (large reports were cut off when piped)
+  if (json) process.stdout.write(JSON.stringify(report, null, 2) + '\n', () => process.exit(code));
+  else process.exit(code);
 })().catch(e => { console.error('Could not scan: ' + e.message); process.exit(3); });
