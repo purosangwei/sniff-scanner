@@ -1,7 +1,9 @@
 'use strict';
 // Telegram bot: /scan <github link>, or send a .zip. Long polling, no dependencies.
-const TG = token => (method, body) => fetch(`https://api.telegram.org/bot${token}/${method}`, {
+// Every call has a deadline, so a hung connection can't stall the poll loop.
+const TG = token => (method, body, ms = 30000) => fetch(`https://api.telegram.org/bot${token}/${method}`, {
   method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}),
+  signal: AbortSignal.timeout(ms),
 }).then(r => r.json());
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -64,12 +66,31 @@ function start({ runScan, publicUrl }) {
     }
   }
 
+  // Remember what we've already handled, so a message that Telegram hands over twice is only scanned once.
+  const seen = new Map();
+  const firstTime = key => {
+    if (seen.has(key)) return false;
+    seen.set(key, Date.now());
+    if (seen.size > 2000) for (const [k, t] of seen) { if (Date.now() - t > 3600e3) seen.delete(k); }
+    return true;
+  };
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+
   (async function poll() {
     for (;;) {
       try {
-        const r = await api('getUpdates', { offset, timeout: 50, allowed_updates: ['message'] });
-        for (const u of r.result || []) { offset = u.update_id + 1; if (u.message) handle(u.message); }
-      } catch (e) { await new Promise(r => setTimeout(r, 5000)); }
+        const r = await api('getUpdates', { offset, timeout: 50, allowed_updates: ['message'] }, 65000);
+        if (!r.ok) { console.log(`[bot] getUpdates failed: ${r.error_code} ${r.description}`); await sleep(5000); continue; }
+        for (const u of r.result) {
+          offset = Math.max(offset, u.update_id + 1);
+          const m = u.message;
+          if (!m) continue;
+          const fresh = firstTime('u' + u.update_id) & firstTime(m.chat.id + ':' + m.message_id);
+          if (!fresh) { console.log(`[bot] skipped repeat update ${u.update_id}`); continue; }
+          console.log(`[bot] update ${u.update_id} msg ${m.message_id}`);
+          handle(m);
+        }
+      } catch (e) { await sleep(5000); }
     }
   })();
   console.log('Telegram bot polling');
