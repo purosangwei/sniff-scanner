@@ -92,7 +92,7 @@ function print(r) {
     try { report = await scanGithub(target, opts); }
     catch (e) {
       // GitHub unreachable from here (some sandboxes block it): ask the live $SNIFF server instead.
-      const api = process.env.SNIFF_API || 'https://sniff-scanner.onrender.com';
+      const api = process.env.SNIFF_API || 'https://sniffrepo.com';
       const res = await fetch(api + '/api/scan', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ url: target }) });
       const j = await res.json().catch(() => ({ error: 'bad reply' }));
       if (j.error) throw new Error(e.message + ' / via ' + api + ': ' + j.error);

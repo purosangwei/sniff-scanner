@@ -1,6 +1,8 @@
-# $SNIFF Coding Test Scanner
+# $SNIFF Repo Scanner
 
-Scans a recruiter's "take-home coding test" for the tricks used in fake-recruiter malware attacks, before you run it. Paste a GitHub link or drop a zip and get a red / amber / grey report in plain English.
+Live at **[sniffrepo.com](https://sniffrepo.com)**.
+
+Scans a repo before you run it (a recruiter's take-home coding test, a starter kit, a tool from a stranger) for the tricks used in fake-recruiter malware attacks. Paste a GitHub link or drop a zip and get a red / amber / grey report in plain English.
 
 **It never runs the code.** GitHub repos are downloaded as a tarball into memory (no `git clone`, so no hooks, submodules or LFS filters), archives are unpacked in memory (nothing written to disk), and every check is a text rule. No dependencies at all.
 
