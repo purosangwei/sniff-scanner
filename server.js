@@ -87,10 +87,22 @@ function readBody(req, max) {
     req.on('error', reject);
   });
 }
-const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8' };
-function serveStatic(res, rel) {
+const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon', '.txt': 'text/plain; charset=utf-8', '.mp4': 'video/mp4', '.jpg': 'image/jpeg' };
+function serveStatic(res, rel, req) {
   const p = path.normalize(path.join(PUBLIC, rel));
   if (!p.startsWith(PUBLIC)) return send(res, 404, 'Not found', 'text/plain');
+  // videos are streamed with byte ranges (Safari won't play an mp4 without them)
+  if (p.endsWith('.mp4')) return fs.stat(p, (err, st) => {
+    if (err) return send(res, 404, 'Not found', 'text/plain');
+    const m = /^bytes=(\d*)-(\d*)$/.exec((req && req.headers.range) || '');
+    let start = 0, end = st.size - 1, code = 200;
+    if (m) { start = m[1] ? +m[1] : Math.max(0, st.size - +m[2]); end = m[1] && m[2] ? Math.min(+m[2], st.size - 1) : st.size - 1; code = 206; }
+    if (start > end || start >= st.size) { res.writeHead(416, { 'content-range': `bytes */${st.size}` }); return res.end(); }
+    const h = Object.assign({}, SEC_HEADERS, { 'content-type': 'video/mp4', 'accept-ranges': 'bytes', 'content-length': end - start + 1, 'cache-control': 'public, max-age=86400' });
+    if (code === 206) h['content-range'] = `bytes ${start}-${end}/${st.size}`;
+    res.writeHead(code, h);
+    fs.createReadStream(p, { start, end }).pipe(res);
+  });
   fs.readFile(p, (err, buf) => {
     if (err) return send(res, 404, 'Not found', 'text/plain');
     send(res, 200, buf, MIME[path.extname(p)] || 'application/octet-stream', { 'cache-control': rel.endsWith('.html') ? 'no-cache' : 'public, max-age=300' });
@@ -134,7 +146,7 @@ const server = http.createServer(async (req, res) => {
       const report = await runScan('upload', { buf, name }, clientIp(req));
       return send(res, 200, report);
     }
-    if (req.method === 'GET' && /^\/(vendor\/)?[\w.-]+\.(js|css|svg|png|ico|txt)$/.test(p)) return serveStatic(res, p.slice(1));
+    if (req.method === 'GET' && /^\/(vendor\/|media\/)?[\w.-]+\.(js|css|svg|png|jpg|ico|txt|mp4)$/.test(p)) return serveStatic(res, p.slice(1), req);
     send(res, 404, 'Not found', 'text/plain');
   } catch (e) { errorOut(res, e); }
 });

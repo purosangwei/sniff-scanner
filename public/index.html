@@ -15,6 +15,10 @@
 <link rel="stylesheet" href="/style.css">
 </head>
 <body>
+<div id="intro" hidden aria-hidden="true">
+  <video id="introVid" muted playsinline preload="auto" poster="/media/binance-hack.jpg"><source src="/media/intro.mp4" type="video/mp4"></video>
+  <button class="lnk intro-skip" id="introSkip" type="button">Skip</button>
+</div>
 <div id="drop" aria-hidden="true"><span>Drop the zip to scan it</span></div>
 
 <div class="wrap">
@@ -28,6 +32,7 @@
     <h1 aria-label="A fake coding test cost Binance $6.3 billion. Scan your repo before you run it."><span aria-hidden="true"><span class="w" style="--i:0">A</span> <span class="w" style="--i:1">fake</span> <span class="w" style="--i:2">coding</span> <span class="w" style="--i:3">test</span> <span class="w" style="--i:4">cost</span> <span class="w" style="--i:5">Binance</span> <span class="w" style="--i:6">$6.3</span> <span class="w" style="--i:7">billion.</span><br><span class="dim"><span class="w" style="--i:8">Scan</span> <span class="w" style="--i:9">your</span> <span class="w" style="--i:10">repo</span> <span class="w" style="--i:11">before</span> <span class="w" style="--i:12">you</span> <span class="w" style="--i:13">run</span> <span class="w" style="--i:14">it.</span></span></span></h1>
     <p data-float="900">A few other scanners exist, but they're built for security experts. $SNIFF is the first anyone can use without knowing what to look for. Paste a link, get a plain-English answer, nothing to install.</p>
     <p class="hero-small" data-float="1000">Free. About 30 seconds. We read the files and never run them.</p>
+    <button class="watch" id="watch" type="button" data-float="1100"><i aria-hidden="true"></i>Watch how the Binance hack happened <span>1 min</span></button>
   </section>
 
   <div class="drift" aria-hidden="true"><div>
@@ -123,6 +128,13 @@
     <p>$SNIFF flags known risks. It can't promise a repo is safe, and neither can any other scanner.</p>
     <p>An independent tool, not affiliated with Binance or any exchange. Uploaded files are read in memory and not kept; results are saved so you can share the link.</p>
   </footer>
+</div>
+
+<div id="film" class="film" hidden role="dialog" aria-modal="true" aria-label="How the Binance hack happened">
+  <div class="film-box">
+    <video id="filmVid" controls playsinline preload="none" poster="/media/binance-hack.jpg"><source src="/media/binance-hack.mp4" type="video/mp4"></video>
+    <button class="lnk film-close" id="filmClose" type="button">Close</button>
+  </div>
 </div>
 
 <script src="/vendor/lenis.min.js"></script>

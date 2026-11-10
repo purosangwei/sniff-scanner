@@ -132,6 +132,34 @@
     io.observe(list);
   })();
 
+  // ---------- first visit: an 8-second muted teaser, then the page. Once per visitor, always skippable.
+  (function () {
+    var box = $('intro'), v = $('introVid'), seen = false;
+    try { seen = localStorage.getItem('sniff-intro') === '1'; } catch (e) {}
+    if (seen || reduced || location.pathname !== '/') return;
+    function done() {
+      try { localStorage.setItem('sniff-intro', '1'); } catch (e) {}
+      box.classList.add('out'); setTimeout(function () { box.hidden = true; }, 700);
+    }
+    box.hidden = false;
+    $('introSkip').addEventListener('click', done);
+    v.addEventListener('ended', done);
+    v.addEventListener('error', done);
+    var p = v.play(); if (p && p.catch) p.catch(done);   // if the browser won't autoplay, just show the page
+    setTimeout(function () { if (!box.hidden && v.paused) done(); }, 2500);
+  })();
+
+  // ---------- the full film, with sound, only when someone asks for it
+  (function () {
+    var film = $('film'), v = $('filmVid'), last = null;
+    function open() { last = document.activeElement; film.hidden = false; requestAnimationFrame(function () { film.classList.add('in'); }); v.currentTime = 0; var p = v.play(); if (p && p.catch) p.catch(function () {}); $('filmClose').focus(); }
+    function close() { v.pause(); film.classList.remove('in'); setTimeout(function () { film.hidden = true; }, 300); if (last) last.focus(); }
+    $('watch').addEventListener('click', open);
+    $('filmClose').addEventListener('click', close);
+    film.addEventListener('click', function (e) { if (e.target === film) close(); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !film.hidden) close(); });
+  })();
+
   // sample repos: fill the box and scan straight away
   document.querySelectorAll('.sample').forEach(function (b) {
     b.addEventListener('click', function () {
